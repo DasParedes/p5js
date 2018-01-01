@@ -1,4 +1,4 @@
-var w = 600, h = 400;
+var w = 1080, h = 900;
 
 var aviao;
 
