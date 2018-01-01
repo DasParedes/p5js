@@ -1,0 +1,25 @@
+versionamento manual
+
+28/09
+
+unitys:
+	pos agora é o centro da figura
+	ela se desenha a partir do centro em direção as pontas
+
+forces
+	se desenham
+	guardam se estão ativas ou não
+
+keyControls
+	action:
+		atualiza o thurst nos forces
+
+obj:
+	display()
+		show all of the forces = true in the moment
+		and turn false one to one
+
+05/10
+	arrumei vetores e giro da nave ( q + e = movimento para frente )
+
+	problema: q|e + w = movimento giratório muito rápido

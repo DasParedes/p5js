@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<h1>Hello</h1>
+	<script>
+		// qualquer tipo de tecla
+		document.addEventListener("keydown", (event) => {
+			console.log(event.key);
+		});
+		// tecla que produz um "character value", like alphabetic, numeric and punctuation.
+		// ignoes a.t, shift, ctrl or meta
+		document.addEventListener("keypress", (event) => {
+			console.log(event.key);
+		})
+		// tecla que foi solta
+		document.addEventListener("keyup", (event) => {
+			console.log(event.key);
+		});
+
+	</script>
+</body>
+</html>

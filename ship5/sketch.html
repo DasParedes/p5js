@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<head>
+	<!-- <meta http-equiv="refresh" content="30">-->
+	<meta charset="utf-8">
+</head>
+<body>
+    <section id="window">
+            HUD
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+    <script src="unity.js"></script>
+    <script src="ship.js"></script>
+    <script src="keyControls.js"></script>
+    <script src="prop.js"></script>
+    <script src="HUD.js"></script>
+
+	<script>
+// ---------
+function displayGrid(){
+	fill(100);
+	stroke(100);
+	for(var i=0; i<height; i+= 50){
+		line(0, i, width, i);
+	}
+	for(var j=0; j<width; j+=50){
+		line(j, 0, j, height);
+	}
+}
+
+var SCALE = 50;
+
+class Force {
+	constructor(x, y, fx, fy, rot){
+		this.thrust = false;
+		this.pos = createVector(x, y);
+		this.force = createVector(fx, fy);
+	}
+
+	display(color){
+		stroke(0, 255, 255);
+		ellipse(this.pos.x, this.pos.y, 20, 20);
+		if(color)
+			stroke(color);
+		stroke(255, 20, 20);
+		strokeWeight(5);
+		line(	this.pos.x,
+					this.pos.y,
+				 	this.pos.x + this.force.x * SCALE,
+				 	this.pos.y + this.force.y * SCALE
+				);
+	}
+
+	soma(f){
+		//console.log( p5.Vector.sub(f.pos, this.pos));
+		this.pos.add(
+				p5.Vector.sub(f.pos, createVector(obj.cmX, obj.cmY) )
+				//p5.Vector.sub( f.pos, this.pos )
+			);
+		this.force.add(f.force);
+	}
+}
+
+var obj;
+var forcaAntiHorario, forcaHorario,
+	forcaParaFrente, forcaParaTras,
+	forcaLateralEsq, forcaLateralDir;
+
+var forcas = [];
+var parcial;
+
+function setup(){
+  // size(800, 600);
+  createCanvas(800, 600);
+
+  // obj 'ship' e a posição inicial
+  obj = new Obj(width/2, height/2);
+
+  // adiciona as diversas unidades ao obj
+  // linha de comprimento 5
+  for(var i=0; i<5; i++){
+    obj.addUnity( new Unity(i * 20, 0, 20) );
+  }
+  // coluna de comprimento 4
+  for(var i=1; i<5; i++){
+    obj.addUnity( new Unity(2 * 20, i * 20, 20) );
+  }
+
+	// propulsores e localização
+	//obj.addUnity( new Prop(- 20, 0, 10));
+
+  //         force = constructor(x,    y, fx fy){
+  forcas.push( forcaAntiHorario = new Force(4 * 20, 10, 0, -1));
+  forcas.push( forcaHorario  =  	new Force(0 * 20, 10, 0, -1));
+
+  var empuxo = 2;
+  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY,
+  																							  0, -empuxo) );
+  forcas.push( forcaParaTras = new Force(   obj.cmX, obj.cmY,
+  																							  0, empuxo) );
+
+  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY,
+  																					 	     empuxo, 0) );
+  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY,
+  																							  -empuxo, 0) );
+
+	frameRate(60);
+}
+
+var STOP = false;
+
+function draw(){
+	if(!STOP){
+	  background(200);
+	  displayGrid();
+
+	  action(obj);
+	  atualizaForca();
+	  obj.update();
+	  obj.display();
+	}
+
+}
+
+function pause(){
+	STOP = !STOP;
+ }
+
+function Antiga_atualizaForca(){
+	forcas.forEach( function(f){
+		if(f.thrust){
+			obj.applyForce(f);
+		}
+	});
+}
+
+
+// nova teste
+function atualizaForca(){
+	parcial = new Force(obj.cmX, obj.cmY, 0, 0);
+	//parcial = new Force(0, 0, 0, 0);
+	forcas.forEach( function(f){
+		if(f.thrust){
+			parcial.soma(f);
+		}
+	});
+	obj.applyForce(parcial);
+}
+
+
+// obj.method( "param" , function() { code; } );
+	</script>
+
+</body>
+</html>

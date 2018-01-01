@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<head>
+<title></title>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+<script>
+
+class Button{
+	constructor(x, y, width, height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		this.r = 100;
+		this.g = 100;
+		this.b = 100;
+
+		this.dragged = true;
+	}
+
+	display(){
+		fill(this.r, this.g, this.b);
+		rect(this.x, this.y, this.width, this.height);
+	}
+
+	// function of the button
+	f(){
+		// nothing
+	}
+}
+
+class Component{
+	constructor(){
+		this.lista = [];
+	}
+
+	addObj(obj){
+		this.lista.push(obj);
+	}
+
+	display(){
+		this.lista.forEach( function(obj){
+			obj.display();
+		});
+	}
+
+	isInside(){
+		var reference;
+		this.lista.forEach( function(current, index, array, thisArg){
+			console.log(mouseX + " " + mouseY);
+			if(current.x + current.width > mouseX &&
+				 current.x < mouseX &&
+				 current.y + current.height > mouseY &&
+				 current.y < mouseY){
+					 reference = array[index];
+				 }
+		});
+		return reference;
+	}
+}
+
+aba = new Component();
+but = new Button(100, 100, 50, 50);
+but.dragged = false;
+but.f = function(){
+		edicao = !edicao;
+		if(edicao){
+			this.r = 250;
+		} else {
+			this.r = 150;
+		}
+}
+but.r = 150;
+but.g = 100;
+but.b = 50;
+
+aba.addObj(but);
+but = new Button(300, 100, 50, 20);
+aba.addObj(but);
+but = new Button(100, 400, 150, 50);
+aba.addObj(but);
+
+function setup(){
+	createCanvas(600, 500);
+}
+
+function draw(){
+	background(55);
+	aba.display();
+}
+
+var action = null;
+var edicao = false;
+
+function mousePressed(){
+	if(action == null){
+		action = aba.isInside();
+		if(action != null)
+			action.f();
+	}
+}
+
+function mouseDragged(){
+	if(edicao && action.dragged){
+		action.x = mouseX - action.width/2;
+		action.y = mouseY - action.height/2;
+	}
+}
+
+function mouseReleased(){
+	action = null;
+}
+
+</script>
+</body>
+</html>
