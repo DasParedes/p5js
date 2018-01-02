@@ -17,6 +17,13 @@
 <h1>Ângulos!</h1>
 <p>O campo abaixo captura a posição do mouse em relação ao centro do campo, e a partir disso gera o valor em radianos do ângulo em relação ao centro, o seno e o Cosseno desse ângulo, e mostra na tela.</p>
 <script>
+	/* Colocar marcações dos ângulos mais comuns:
+		0º = 0 ou PI
+		30º = PI/6
+		45º = PI/4
+		60º = PI/3
+		90º = PI/2
+	*/
 	var pos;
 	var radio;
 
@@ -42,19 +49,25 @@
 
 		// mouse position in relation with the center of the canvas
 		pos = createVector(mouseX - width/2, mouseY - height/2);
+		var sin = pos.y / pos.mag() * -1;
+		var cos = pos.x / pos.mag();
+
 		angle = pos.heading();	
 		angle *= -1;
 		if(angle < 0){
 			angle = TWO_PI + angle;
 		}
 		pos.normalize();
-
-		// seno e cosseno
-		var sin = pos.y * -1;
-		var cos = pos.x;
-
 		// colocar o fim do vetor na circunferência do círculo
 		pos.mult(radio);
+
+		// seno e cosseno
+		//soh cah toa
+		//var sin = pos.y * -1;
+		//var cos = pos.x;
+		
+
+		
 
 		// draw the cosseno line
 		stroke(255, 0, 0);
