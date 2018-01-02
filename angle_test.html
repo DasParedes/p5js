@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ângulo Teste</title>
+<!-- Inclusão de bibliotecas P5JS -->
+<!-- <script src="libraries/p5.js" type="text/javascript"></script>
+<script src="libraries/p5.dom.js" type="text/javascript"></script> -->
+<!-- Local Access 
+<script src="../../p5_libraries/p5.js"></script>
+<script src="../../p5_libraries/addons/p5.dom.js"></script> -->
+<!-- CDN - for the github server -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/addons/p5.dom.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js" type="text/javascript"></script>
+</head>
+<body>
+<h1>Ângulos!</h1>
+<p>O campo abaixo captura a posição do mouse em relação ao centro do campo, e a partir disso gera o valor em radianos do ângulo em relação ao centro, o seno e o Cosseno desse ângulo, e mostra na tela.</p>
+<script>
+	var pos;
+	var radio;
+
+	function setup(){
+		createCanvas(500, 400);
+
+		radio = height/2 - height/10;
+	}
+
+	function draw(){
+		background(200);
+
+		push();
+		translate(width/2, height/2);
+
+		// ellipse and rect lines draw
+		noFill();
+		stroke(40);
+		ellipse(0, 0, radio*2);
+		stroke(100);
+		line(-radio, 0, radio, 0);
+		line(0, -radio, 0, radio);
+
+		// mouse position in relation with the center of the canvas
+		pos = createVector(mouseX - width/2, mouseY - height/2);
+		angle = pos.heading();	
+		angle *= -1;
+		if(angle < 0){
+			angle = TWO_PI + angle;
+		}
+		pos.normalize();
+
+		// seno e cosseno
+		var sin = pos.y * -1;
+		var cos = pos.x;
+
+		// colocar o fim do vetor na circunferência do círculo
+		pos.mult(radio);
+
+		// draw the cosseno line
+		stroke(255, 0, 0);
+		line(0, 0, pos.x, 0); // Cos
+		line(0, pos.y, pos.x, pos.y); 
+
+		// draw the seno line
+		stroke(0, 180, 0);
+		line(0, 0, 0, pos.y); // Sin
+		line(pos.x, 0, pos.x, pos.y); 
+
+		// draw the hipotenusa line
+		stroke(0, 0, 250);
+		line(0, 0, pos.x, pos.y);
+		pop();
+
+		// Draw the texts
+		var text_size = 20;
+		var margin = 10;
+		var line_size = (text_size + margin);
+		var line_number = 1;
+		textSize(text_size);
+		fill(10);
+		text("Radians: " + angle.toPrecision(4), margin, line_size * line_number);
+		line_number++;
+		fill(250, 0, 0);
+		text("Seno: " + sin.toPrecision(2), margin, line_size * line_number);
+		line_number++;
+		fill(0, 150, 0);
+		text("Coseno: " + cos.toPrecision(2), margin, line_size * line_number);
+	}
+</script>
+</body>
+</html>
