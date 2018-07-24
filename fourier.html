@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<head>
+	<title>Fourier Transformation</title>
+</head>
+<body>
+    <h1>Visualization</h1>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.js"></script>
+
+<script>
+    var teste_slide;
+    var FREQ = [1, 2, 3, 4];
+    var PRECISION = .02;
+
+    function setup(){
+        createCanvas(500, 800);
+
+        teste_slide = createSlider(0, FREQ.length * 100, 0);
+        teste_slide.position(200, 550);
+    }
+
+    var OFF_SET = 40;
+    var LARG = 100;
+    var ALT = 100;
+
+    
+
+    var graficos = [];
+    var SOMA = [];
+
+    function draw(){
+        background(55);        
+
+        var OFF = 50;
+        FREQ.forEach(item => {
+            push();
+            translate(50,OFF);
+            draw_graphic(item);
+            pop();    
+            OFF += 100;
+        })
+        push()
+        translate(50, 450);
+        draw_graph(graficos);
+        pop();
+
+        push();
+        translate(100, 550);
+        fill(20);
+
+        rect(-50, -50, 100, 100);
+
+        stroke(200);
+        noFill();
+        beginShape();
+        var teste_freq = 1;
+        SOMA.forEach((item, index)=>{
+            var mod = TWO_PI * index * PRECISION * teste_slide.value()/50;
+            vertex(50 * sin(mod) * item, 50 * cos(mod) * item);
+        });
+        endShape();
+        pop();
+
+    }
+
+    function draw_graphic(frequencia){
+        graficos[frequencia] = [];
+        noStroke(0);
+        fill(100);
+        rect(0, -50, 400, 100);
+
+        stroke(0);
+        line(0,0, 400, 0);
+        
+        stroke(0);
+        for(var i=0; i<10; i++){
+            if(i%2){
+                line(i*LARG, ALT/2, i*LARG, -ALT/2);
+            } else {
+                line(i*LARG, ALT, i*LARG, -ALT);
+            }
+        }
+
+        stroke(255, 0, 0);
+        noFill();
+        beginShape();
+        for(var i=0; i<=4; i+=PRECISION){
+            graficos[frequencia].push(sin(PI*i*frequencia));
+            vertex(i*LARG, sin(PI*i*frequencia)*ALT);
+        }
+        endShape();
+    }
+
+    function draw_graph(graph){
+        noStroke(0);
+        fill(120);
+        rect(0, -50, 400, 100);
+
+        stroke(0);
+        line(0,0, 400, 0);
+        for(var i=0; i<10; i++){
+            if(i%2){
+                line(i*LARG, ALT/2, i*LARG, -ALT/2);
+            } else {
+                line(i*LARG, ALT, i*LARG, -ALT);
+            }
+        }
+
+        stroke(50, 255, 50);
+        noFill();
+        beginShape();
+        for(var i=0, j=0; i<=4; i+=PRECISION, j++){
+            var soma = 0;
+            graficos.forEach(item => {
+                soma += item[j]; 
+            })
+            SOMA.push(soma);
+            vertex(i*LARG, soma*ALT);
+        }
+        endShape();
+    }
+</script>
+</body>
+</html>

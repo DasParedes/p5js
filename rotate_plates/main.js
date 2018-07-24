@@ -11,8 +11,14 @@
 var plates = [];
 var body;
 var bullets = [];
-
 var targets = [];
+
+//var CENTER_BODY = false;
+var CENTER_BODY = true;
+
+// Teclas pressioanadas no momento
+var keys = [];
+
 
 function setup(){
 	createCanvas(600, 600);
@@ -90,3 +96,14 @@ function draw(){
 	}
 	pop();
 }
+
+// Funções para atualizar as teclas pressionadas no momento
+document.addEventListener("keydown", (event) => {
+	if(keys.indexOf(event.key) == -1){
+		keys.push(event.key.toLowerCase());
+	}
+});
+
+document.addEventListener("keyup", (event) => {
+	keys.splice(keys.indexOf(event.key), 1);
+})

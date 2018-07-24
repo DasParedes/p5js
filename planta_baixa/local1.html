@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<head>
+	<title>Local1</title>
+</head>
+<body>
+        <h1>Local1</h1>
+        <a href="local3.html">Local3</a>
+        <a href="local2.html">Local2</a>
+	<a href="index.html">Home</a>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+	<script>
+		var keys = [];
+		var larg = 20;
+		var alt = 50;
+
+		class Player{
+			constructor(){
+				this.y = 200;
+				this.x = 0;
+			}
+
+			draw(){
+				fill(0);
+				rect(this.x, this.y, larg, alt);
+			}
+		}
+		
+		var p1 = new Player();
+		var p2 = new Player();
+		function setup(){
+			createCanvas(400, 400);
+
+		}
+
+		function draw(){
+			background(55);
+		}
+
+		document.addEventListener("keydown", (event) => {
+			if(keys.indexOf(event.key) == -1){
+		keys.push(event.key.toLowerCase());
+	}
+});
+
+document.addEventListener("keyup", (event) => {
+	keys.splice(keys.indexOf(event.key), 1);
+});
+
+	</script><
+</body>
+</html>

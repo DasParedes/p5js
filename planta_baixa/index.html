@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+	<title>Home</title>
+</head>
+<body>
+        <h1>Home</h1>
+        <a href="local1.html">Local1</a>
+        <a href="local2.html">Local2</a>
+	<a href="local3.html">Local3</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+<!--
+<script src="../../p5_libraries/addons/p5.dom.js"></script>
+-->
+
+<script>
+/*
+Ler informações de para qual links estão ligados as outras redes, e mostrar isso na tela.
+
+Percorrer cada um dos sítios, como um bonequinho 2d andando por quadrados. 
+Caso o sítio tenha um link de volta para o sítio de onde tu veio, mostrar na saída correta.
+Caso contrário, colocar no meio e caso queira voltar, ir para o portal no meio.
+Mostrar as casas adjacentes até 'n' pulos. Inicialmente apenas n=1. Brincar depois com n=2. 
+*/
+function get_information(link, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", link, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            callback(xhr.responseText);
+        }
+    };
+    xhr.send(null);
+}
+
+get_information("/details/item1.html", function(text) {
+    var div = document.createElement("div");
+    div.innerHTML = text;
+    // Do something with the div here, like inserting it into the page
+});
+</script>
+
+<script src="Room.js"></script>
+<script src="../rotate_plates/classes.js"></script>
+
+<script src="acoes.js"></script>
+<!--
+<script>
+    var room;
+    var h = 400;
+    var w = 500;
+    var atual = null;
+
+    function setup(){
+        createCanvas(w, h);
+        atual = set_example();
+        frameRate(2);
+    }
+
+    function draw(){
+        background(55);
+        push();
+        translate(w/2 - atual.largura/2, h/2 - atual.altura/2);
+        atual.draw();
+        atual.draw_adjacentes();
+        pop();
+
+        // Pra ser apenas um adjacente
+        //cozinha.draw_adjacentes();
+        stroke(255);
+        line(w/2, 0, w/2, h);
+        line(0, h/2, w,  h/2);
+    }
+</script>-->
+
+
+
+</body>
+</html>

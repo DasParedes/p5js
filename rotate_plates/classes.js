@@ -116,22 +116,22 @@ class Body{
 		array.forEach( (item, index, array) => {
 			switch(item.toLowerCase()){
 				case 'w':
-					this.vel.y = -1;
+					this.vel.y = -2;
 					break;
 				case 's':
-					this.vel.y = +1;
+					this.vel.y = +2;
 					break;
 				case 'd':
-					this.vel.x = +1;
+					this.vel.x = +2;
 					break;
 				case 'a':
-					this.vel.x = -1;
+					this.vel.x = -2;
 					break;
 				case 'e':
-					this.angle -= 0.1;
+					this.angle -= 0.05;
 					break;
 				case 'q':
-					this.angle += 0.1;
+					this.angle += 0.05;
 					break;
 				case ' ':
 					this.shoot = true;
@@ -159,6 +159,7 @@ class Body{
 			}
 	}
 
+	// with circles objects
 	collision(obj){
 		var size = this.size;
 		if( obj.pos.x < (this.pos.x + size/2) && obj.pos.y < (this.pos.y + size/2) &&
