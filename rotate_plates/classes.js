@@ -127,10 +127,10 @@ class Body{
 				case 'a':
 					this.vel.x = -2;
 					break;
-				case 'e':
+				case 'q':
 					this.angle -= 0.05;
 					break;
-				case 'q':
+				case 'e':
 					this.angle += 0.05;
 					break;
 				case ' ':

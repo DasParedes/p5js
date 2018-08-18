@@ -8,14 +8,34 @@ var eu = null;
 const CENTER_BODY = true;
 var atual_room = null;
 
+
+var BG = 150;
+var hud;
+var mode = 0;
+var adjacentes = [];
+
 function setup(){
 	createCanvas(w, h);
+
+	hud = hud_setup();
+	var but = hud.button.push(
+		createButton('Edit', 0)
+			.position(10, 5)
+			.mousePressed(changeMode)
+		);
+	console.log(but);
+
 	eu = new Body(0, 0);
 	eu = set_body(eu);
 	atual = set_example_house();
 
 	eu.pos.x = atual.pos.x + atual.largura/2;
 	eu.pos.y = atual.pos.y + atual.altura/2;
+
+	adjacentes = atual.calcula_adjacentes();
+
+	console.log(atual.pos);
+	adjacentes.forEach( item => { console.log(item.pos); });
 
 	console.log("eu: " + eu.pos);
 	console.log("atual pos: " + atual.pos);
@@ -24,24 +44,28 @@ function setup(){
 }
 
 function draw(){
-	push();
-	if(CENTER_BODY){
-		translate(width/2, height/2);
-		rotate(eu.angle);
-		translate(-eu.pos.x, -eu.pos.y);
+	switch(mode){
+		case 0:
+			hud.andando();
+			break;
+		case 1:		
+			hud.editando();
+			break;
 	}
-	background(150);
+}
 
-	atual.draw_absoluto();
-	atual.draw_adjacentes();
-
-	eu.update();
-	//eu.isOut();
-	eu.draw();
-	
-	debug();
-	pop();
-	//stop();
+function changeMode(){
+	console.log("Mudando modo para");
+	switch(mode){
+		case 0:
+			console.log("Andando");
+			mode = 1;
+			break;
+		case 1:
+			console.log("Editando");
+			mode = 0;
+			break;
+	}
 }
 
 document.addEventListener("keydown", (event) => {
@@ -90,8 +114,9 @@ function set_body(body){
 					next.pos.x -= next.size.x;
 				}
 				atual = atual.adjacentes[saiu-1];
-
 			}
+			adjacentes = atual.calcula_adjacentes();
+			
 		} else {
 			if(CENTER_BODY){
 				this.pos.add(this.vel.rotate(-this.angle));
@@ -100,10 +125,6 @@ function set_body(body){
 			}
 			this.shoot = false;
 		}
-		
-		
-
-		frameRate(5);
 	};
 
 	// out of the screen
