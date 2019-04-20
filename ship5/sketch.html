@@ -14,6 +14,7 @@
     <script src="keyControls.js"></script>
     <script src="prop.js"></script>
     <script src="HUD.js"></script>
+    <script src="Force.js"></script>
 
 	<script>
 // ---------
@@ -29,37 +30,6 @@ function displayGrid(){
 }
 
 var SCALE = 50;
-
-class Force {
-	constructor(x, y, fx, fy, rot){
-		this.thrust = false;
-		this.pos = createVector(x, y);
-		this.force = createVector(fx, fy);
-	}
-
-	display(color){
-		stroke(0, 255, 255);
-		ellipse(this.pos.x, this.pos.y, 20, 20);
-		if(color)
-			stroke(color);
-		stroke(255, 20, 20);
-		strokeWeight(5);
-		line(	this.pos.x,
-					this.pos.y,
-				 	this.pos.x + this.force.x * SCALE,
-				 	this.pos.y + this.force.y * SCALE
-				);
-	}
-
-	soma(f){
-		//console.log( p5.Vector.sub(f.pos, this.pos));
-		this.pos.add(
-				p5.Vector.sub(f.pos, createVector(obj.cmX, obj.cmY) )
-				//p5.Vector.sub( f.pos, this.pos )
-			);
-		this.force.add(f.force);
-	}
-}
 
 var obj;
 var forcaAntiHorario, forcaHorario,
@@ -86,25 +56,20 @@ function setup(){
     obj.addUnity( new Unity(2 * 20, i * 20, 20) );
   }
 
-	// propulsores e localização
-	//obj.addUnity( new Prop(- 20, 0, 10));
+  // propulsores e localização
+  //obj.addUnity( new Prop(- 20, 0, 10));
 
   //         force = constructor(x,    y, fx fy){
-  forcas.push( forcaAntiHorario = new Force(4 * 20, 10, 0, -1));
-  forcas.push( forcaHorario  =  	new Force(0 * 20, 10, 0, -1));
+  forcas.push( forcaAntiHorario = new Force(4 * 20, -10, 0, -10));
+  forcas.push( forcaHorario  =  	new Force(0 * 20, -10, 0, -10));
 
-  var empuxo = 2;
-  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY,
-  																							  0, -empuxo) );
-  forcas.push( forcaParaTras = new Force(   obj.cmX, obj.cmY,
-  																							  0, empuxo) );
-
-  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY,
-  																					 	     empuxo, 0) );
-  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY,
-  																							  -empuxo, 0) );
-
-	frameRate(60);
+  var empuxo = 10;
+  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY, 0, -empuxo) )
+  forcas.push( forcaParaTras = new Force(   obj.cmX, obj.cmY, 0, empuxo) );
+  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
+  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
+  
+  frameRate(30);
 }
 
 var STOP = false;
@@ -126,7 +91,7 @@ function pause(){
 	STOP = !STOP;
  }
 
-function Antiga_atualizaForca(){
+function atualizaForca(){
 	forcas.forEach( function(f){
 		if(f.thrust){
 			obj.applyForce(f);
@@ -134,22 +99,7 @@ function Antiga_atualizaForca(){
 	});
 }
 
-
-// nova teste
-function atualizaForca(){
-	parcial = new Force(obj.cmX, obj.cmY, 0, 0);
-	//parcial = new Force(0, 0, 0, 0);
-	forcas.forEach( function(f){
-		if(f.thrust){
-			parcial.soma(f);
-		}
-	});
-	obj.applyForce(parcial);
-}
-
-
-// obj.method( "param" , function() { code; } );
-	</script>
+</script>
 
 </body>
 </html>

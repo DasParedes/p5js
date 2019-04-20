@@ -45,42 +45,43 @@ class Obj {
 
     this.cmX = cmx_ / mt;
     this.cmY = cmy_ / mt;
+
+    this.center_of_mass = createVector(this.cmX, this.cmY);
   }
 
   applyForce(force){
-    var distance = force.pos.x - this.cmX;
+    //  experimental
+    //  force: Force;
+    //    Force.pos: p5.Vector
+    //    Force.force: p5.Vector
+    var distance = p5.Vector.sub(this.center_of_mass, force.pos);
 
-	  var prop = createVector(force.y, distance); // proporção
+    if (distance.mag() != 0){
+      // angle between distance and the force
+      var angleVector = distance.heading() + force.force.heading();
+      
+      var perpendicular_force = force.force.copy().normalize();
+      perpendicular_force.rotate(angleVector + PI/2);
 
-  	if(distance >= 10 || distance <= 10){
-  		var Mo = force.force.mag() * distance * sin( force.force.heading() );
-  		// caso a força propulsora fora do eixo seja contrária ao movimento rotatório
-  		/*if( abs(Mo + this.velAng) < abs(this.velAng)){
-  			console.log("contrário");
-  			this.vel.add(Mo);
-		  }*/
-      // linear force
-      // quando mais longe do centro de massa, menos força
-      // linear
-      var parcialForce = Mo * ( 1 - cos(force));
-      // this.vel.add( parcialForce );
+      perpendicular_force.mult(sin(angleVector) * force.force.mag());
 
-      // velocidade angular
-		  Mo = Mo / (this.mass * 1000);
-		  this.accelAng += Mo;
-	  }
+      var rotacional_force = perpendicular_force.mag() * distance.mag();
 
-	// a = f /m;
-	// this.accel.add( force.force.div( this.mass ) );
-	var forcaResultante = p5.Vector.mult(force.force, cos( prop.heading() ) );
-	var accelTotal = forcaResultante.div( this.mass);
-	this.accel.add( accelTotal.rotate(this.theta) );
+      // pra arrumar a direção da rotação. 
+      // p5.Vector.angleBetween() não faz distinção horário ou anti-horário
+      rotacional_force *= angleVector / Math.abs(angleVector);
+
+      this.accelAng += rotacional_force / (this.mass * PI * distance.mag());
+    }
+
+    // Linear Acceleration = a = f /m;
+    this.accel.add( p5.Vector.div(force.force, this.mass));
   }
 
   // atualiza os atributos do obj / Component
   update(){
     // atualiza posição e velocidade linear
-  	this.vel.add( this.accel );
+  	this.vel.add( this.accel.rotate(this.theta));
   	this.pos.add( this.vel );
 
     // atualiza velocidade e rotação angular
@@ -124,7 +125,7 @@ class Obj {
     });
 
     // ! excluir depois
-    parcial.display(255);
+    //parcial.display(255);
 
     pop();
   }
