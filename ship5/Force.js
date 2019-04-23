@@ -7,15 +7,18 @@ class Force {
 
 	display(color){
 		stroke(0, 255, 255);
+
 		ellipse(this.pos.x, this.pos.y, 20, 20);
+
 		if(color)
 			stroke(color);
+
 		stroke(255, 20, 20);
 		strokeWeight(5);
 		line(	this.pos.x,
 					this.pos.y,
-				 	this.pos.x + this.force.x * SCALE,
-				 	this.pos.y + this.force.y * SCALE
+				 	this.pos.x - this.force.x * 5,
+				 	this.pos.y - this.force.y * 5
 				);
 	}
 

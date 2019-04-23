@@ -1,4 +1,4 @@
-class Obj {
+class Ship {
   constructor(x, y){
 	// atributos para velocidade 'linear'
 	this.pos = createVector(x, y);
@@ -71,7 +71,7 @@ class Obj {
       // p5.Vector.angleBetween() não faz distinção horário ou anti-horário
       rotacional_force *= angleVector / Math.abs(angleVector);
 
-      this.accelAng += rotacional_force / (this.mass * PI * distance.mag());
+      this.accelAng -= rotacional_force / (this.mass * PI * distance.mag());
     }
 
     // Linear Acceleration = a = f /m;
@@ -94,18 +94,22 @@ class Obj {
   }
 
   // mostra na tela todos as partes do objeto
+  // mostra todos a partir do topo esquerdo do obj como origem
   display(){
 
     push();
-    // mostra todos a partir do topo esquerdo do obj como origem
     // movimenta a origem até a posição do obj
     translate(this.pos.x, this.pos.y);
+    
     // movimenta a origem até o centro de massa
     translate(this.cmX, this.cmY);
+    
     // para rotacionar a name em volta do centro de massa,
     rotate(this.theta);
+    
     // e retorna para o ponto topo esquerdo, com o grid inclidado(theta)
     translate(-this.cmX, -this.cmY);
+    
     // imprime cada uma das partes
     this.unids.forEach( function(u){
 		    u.display();
@@ -116,16 +120,13 @@ class Obj {
     noStroke();
     ellipse(this.cmX, this.cmY, 5, 5);
 
-
+    // imprime os jatos dos propulsores ativados
     forcas.forEach( function(f){
       if(f.thrust){
-        //f.display();
+        f.display();
         f.thrust = false;
       }
     });
-
-    // ! excluir depois
-    //parcial.display(255);
 
     pop();
   }

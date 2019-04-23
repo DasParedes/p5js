@@ -19,10 +19,10 @@ document.addEventListener("keyup", function(event){
 function action(){
 	keys.forEach( function(code){
 		switch(code){
-			case "KeyE":
+			case "KeyQ":
 				forcaAntiHorario.thrust = true;
 				break;
-			case "KeyQ":
+			case "KeyE":
 				forcaHorario.thrust = true;
 				break;
 			case "KeyW":

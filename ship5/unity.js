@@ -1,10 +1,10 @@
 class Unity {
 
   // posição = centro do objeto
-  constructor(x,  y, m){
+  constructor(x,  y, mass){
     this.posX = x;
     this.posY = y;
-    this.mass = m;
+    this.mass = mass;
     this.size = 20;
   }
 

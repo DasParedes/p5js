@@ -39,12 +39,15 @@ var forcaAntiHorario, forcaHorario,
 var forcas = [];
 var parcial;
 
+// center the camera and the ship in the middle of the screen
+var CENTER_CAMERA = true;
+
 function setup(){
   // size(800, 600);
   createCanvas(800, 600);
 
   // obj 'ship' e a posição inicial
-  obj = new Obj(width/2, height/2);
+  obj = new Ship(width/2, height/2);
 
   // adiciona as diversas unidades ao obj
   // linha de comprimento 5
@@ -60,15 +63,21 @@ function setup(){
   //obj.addUnity( new Prop(- 20, 0, 10));
 
   //         force = constructor(x,    y, fx fy){
-  forcas.push( forcaAntiHorario = new Force(4 * 20, -10, 0, -10));
-  forcas.push( forcaHorario  =  	new Force(0 * 20, -10, 0, -10));
+  forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
+  forcas.push( forcaHorario  =  	new Force(0 * 20, 20, 0, -5));
 
   var empuxo = 10;
-  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY, 0, -empuxo) )
+  /*
+  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY, 0, -empuxo*2) )
   forcas.push( forcaParaTras = new Force(   obj.cmX, obj.cmY, 0, empuxo) );
   forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
   forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
-  
+  */
+  forcas.push( forcaParaFrente = new Force( obj.cmX, 5*20, 0, -empuxo*2) )
+  forcas.push( forcaParaTras = new Force(   obj.cmX, -20, 0, empuxo) );
+  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
+  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
+
   frameRate(30);
 }
 
@@ -77,12 +86,20 @@ var STOP = false;
 function draw(){
 	if(!STOP){
 	  background(200);
-	  displayGrid();
 
+    if (CENTER_CAMERA){
+      push();
+      translate(width/2 - obj.pos.x, height/2-obj.pos.y);
+      displayGrid();
+    }
 	  action(obj);
 	  atualizaForca();
 	  obj.update();
 	  obj.display();
+
+    if (CENTER_CAMERA){
+      pop();
+    }
 	}
 
 }
@@ -91,6 +108,7 @@ function pause(){
 	STOP = !STOP;
  }
 
+// arrumar depois.
 function atualizaForca(){
 	forcas.forEach( function(f){
 		if(f.thrust){

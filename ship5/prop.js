@@ -1,10 +1,10 @@
 // one propulsor
 class Prop extends Unity {
 
-	constructor(x, y, m, f){
-		super(x, y, m);
+	constructor(x, y, mass, force){
+		super(x, y, mass);
 		this.thrust = false; //false;
-		this.force = f;
+		this.force = force;
 	}
 
   display(){
@@ -14,7 +14,7 @@ class Prop extends Unity {
     beginShape();
     vertex(0, 0);
     vertex(20, 0);
-    vertex(10, 10);
+    vertex(50, 10);
     endShape();
 
     if(this.thrust){
@@ -26,6 +26,7 @@ class Prop extends Unity {
     	vertex(5, 15);
     	endShape();
   	}
+
   	pop();
 	}
 }
