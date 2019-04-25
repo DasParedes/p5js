@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<head>
+	<!-- <meta http-equiv="refresh" content="30">-->
+	<meta charset="utf-8">
+</head>
+<body>
+    <section id="window">
+            HUD
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+    <script src="unity.js"></script>
+    <script src="ship.js"></script>
+    <script src="keyControls.js"></script>
+    <script src="prop.js"></script>
+    <script src="HUD.js"></script>
+    <script src="Force.js"></script>
+
+	<script>
+// ---------
+function displayGrid(){
+	fill(100);
+	stroke(100);
+	for(var i=0; i<height; i+= 50){
+		line(0, i, width, i);
+	}
+	for(var j=0; j<width; j+=50){
+		line(j, 0, j, height);
+	}
+}
+
+var SCALE = 50;
+
+var obj;
+var forcaAntiHorario, forcaHorario,
+	forcaParaFrente, forcaParaTras,
+	forcaLateralEsq, forcaLateralDir;
+
+var forcas = [];
+var parcial;
+
+// center the camera and the ship in the middle of the screen
+var CENTER_CAMERA = true;
+
+function setup(){
+  // size(800, 600);
+  createCanvas(800, 600);
+
+  // obj 'ship' e a posição inicial
+  obj = new Ship(width/2, height/2);
+
+  // adiciona as diversas unidades ao obj
+  // linha de comprimento 5
+  for(var i=0; i<5; i++){
+    obj.addUnity( new Unity(i * 20, 0, 20) );
+  }
+  // coluna de comprimento 4
+  for(var i=1; i<5; i++){
+    obj.addUnity( new Unity(2 * 20, i * 20, 20) );
+  }
+  
+  // propulsores e localização
+  var soft_propellers = [
+  // pos.x, pos.y, rotate
+    [obj.cmX+20, 20*4, -PI/2],
+    [obj.cmX-20, 20*4, PI/2],
+    [obj.cmX, -20, PI]
+  ];
+  soft_propellers.forEach( function(pair){
+    let prop_control = new Prop_Control( pair[0], pair[1]);
+    prop_control.force.rotate(pair[2]);
+    obj.addUnity( prop_control );
+  });
+
+  var strong_propellers = [
+    [obj.cmX, 20*5, 0]
+  ]
+  strong_propellers.forEach( function(pair){
+    let engine = new Main_Engine( pair[0], pair[1]);
+    engine.force.rotate(pair[2]);
+    obj.addUnity( engine );
+  });
+  
+  //         force = constructor(x,    y, fx fy){
+  forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
+  forcas.push( forcaHorario  =  	new Force(0 * 20, 20, 0, -5));
+
+  var empuxo = 10;
+
+  forcas.push( forcaParaFrente = new Force( obj.cmX, 5*20, 0, -empuxo*2) )
+  forcas.push( forcaParaTras = new Force(   obj.cmX, -20, 0, empuxo) );
+  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
+  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
+
+  frameRate(30);
+}
+
+var STOP = false;
+
+function draw(){
+	if(!STOP){
+	  background(200);
+
+    if (CENTER_CAMERA){
+      push();
+      translate(width/2 - obj.pos.x, height/2-obj.pos.y);
+      displayGrid();
+    }
+	  action(obj);
+	  atualizaForca();
+	  obj.update();
+	  obj.display();
+
+    if (CENTER_CAMERA){
+      pop();
+    }
+	}
+
+}
+
+function pause(){
+	STOP = !STOP;
+ }
+
+// arrumar depois.
+function atualizaForca(){
+	forcas.forEach( function(f){
+		if(f.thrust){
+			obj.applyForce(f);
+		}
+	});
+}
+
+</script>
+
+</body>
+</html>
