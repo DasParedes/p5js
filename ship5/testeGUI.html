@@ -17,7 +17,11 @@ class Button{
 		this.g = 100;
 		this.b = 100;
 
-		this.dragged = true;
+		// objeto fixo ?
+		this.fixed = true;
+
+		// is be dragged
+		this.dragged = false;
 	}
 
 	display(){
@@ -26,8 +30,16 @@ class Button{
 	}
 
 	// function of the button
-	f(){
-		// nothing
+	action(){
+		this.r = 200;
+		this.g = 200;
+		this.b = 200;
+	}
+
+	disAction(){
+		this.r = 100;
+		this.g = 100;
+		this.b = 100;
 	}
 }
 
@@ -54,33 +66,100 @@ class Component{
 				 current.x < mouseX &&
 				 current.y + current.height > mouseY &&
 				 current.y < mouseY){
-					 reference = array[index];
+					if(typeof(current.isInside) === "Function"){
+						reference = current.isInside();
+					}else{
+					 	reference = current;
+					}
 				 }
 		});
 		return reference;
 	}
 }
 
+class HUD {
+	constructor(){
+		this.actual = null;
+		this.lista = [];
+	}
+
+	addAba(obj){
+		this.lista.push(obj);
+	}
+
+	isInside(){
+		return this.actual.isInside();
+	}
+
+	mouseDragged(){
+		this.actual.mouseDragged();
+	}
+
+	display(){
+		if( this.actual ){
+			this.actual.display();
+		}
+	}
+}
+
+var DEBUG = true;
+var target = null;
+var editavel = false;
+
+hud = new HUD();
+
 aba = new Component();
-but = new Button(100, 100, 50, 50);
-but.dragged = false;
-but.f = function(){
-		edicao = !edicao;
-		if(edicao){
+main = aba;
+config = new Component();
+
+but_config = new Button(50, 50, 50, 50);
+but = new Button(100, 100, 50, 50); // editable elements, toogle
+but1 = new Button(300, 100, 50, 20);
+but2 = new Button(100, 400, 150, 50);
+
+hud.addAba(main);
+hud.addAba(config);
+
+hud.actual = aba;
+
+aba.addObj(but_config);
+aba.addObj(but);
+aba.addObj(but1);
+aba.addObj(but2);
+
+config.addObj(but_config);
+
+but.r = 150;
+but.g = 100;
+but.b = 50;
+
+but.action = function(){
+		editavel = !editavel;
+		if(editavel){
 			this.r = 250;
 		} else {
 			this.r = 150;
 		}
 }
-but.r = 150;
-but.g = 100;
-but.b = 50;
+but.disAction = function(){}
 
-aba.addObj(but);
-but = new Button(300, 100, 50, 20);
-aba.addObj(but);
-but = new Button(100, 400, 150, 50);
-aba.addObj(but);
+but_config.action = function(){
+	switch(hud.actual){
+		case config:
+			hud.actual = main;
+			break;
+		case main:
+			hud.actual = config;
+			break;
+		default:
+			if(DEBUG){
+				console.log('Rule not specify');
+			}
+	}
+}
+
+but1.fixed = false;
+but2.fixed = false;
 
 function setup(){
 	createCanvas(600, 500);
@@ -88,29 +167,33 @@ function setup(){
 
 function draw(){
 	background(55);
-	aba.display();
+	hud.display();
 }
 
-var action = null;
-var edicao = false;
-
 function mousePressed(){
-	if(action == null){
-		action = aba.isInside();
-		if(action != null)
-			action.f();
+	if(target == null){
+		target = hud.isInside();
+		if(target != null){
+			target.action();
+		}
 	}
 }
 
 function mouseDragged(){
-	if(edicao && action.dragged){
-		action.x = mouseX - action.width/2;
-		action.y = mouseY - action.height/2;
+	//hud.mouseDragged();
+	
+	if(editavel && !target.fixed){
+		target.x = mouseX - target.width/2;
+		target.y = mouseY - target.height/2;
 	}
+	
 }
 
 function mouseReleased(){
-	action = null;
+	if( target ){
+		target.disAction();
+		target = null;
+	}
 }
 
 </script>
