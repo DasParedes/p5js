@@ -58,21 +58,35 @@ function setup(){
   for(var i=1; i<5; i++){
     obj.addUnity( new Unity(2 * 20, i * 20, 20) );
   }
-
+  
   // propulsores e localização
-  //obj.addUnity( new Prop(- 20, 0, 10));
+  var soft_propellers = [
+  // pos.x, pos.y, rotate
+    [obj.cmX+20, 20*4, -PI/2],
+    [obj.cmX-20, 20*4, PI/2],
+    [obj.cmX, -20, PI]
+  ];
+  soft_propellers.forEach( function(pair){
+    let prop_control = new Prop_Control( pair[0], pair[1]);
+    prop_control.force.rotate(pair[2]);
+    obj.addUnity( prop_control );
+  });
 
+  var strong_propellers = [
+    [obj.cmX, 20*5, 0]
+  ]
+  strong_propellers.forEach( function(pair){
+    let engine = new Main_Engine( pair[0], pair[1]);
+    engine.force.rotate(pair[2]);
+    obj.addUnity( engine );
+  });
+  
   //         force = constructor(x,    y, fx fy){
   forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
   forcas.push( forcaHorario  =  	new Force(0 * 20, 20, 0, -5));
 
   var empuxo = 10;
-  /*
-  forcas.push( forcaParaFrente = new Force( obj.cmX, obj.cmY, 0, -empuxo*2) )
-  forcas.push( forcaParaTras = new Force(   obj.cmX, obj.cmY, 0, empuxo) );
-  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
-  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
-  */
+
   forcas.push( forcaParaFrente = new Force( obj.cmX, 5*20, 0, -empuxo*2) )
   forcas.push( forcaParaTras = new Force(   obj.cmX, -20, 0, empuxo) );
   forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );

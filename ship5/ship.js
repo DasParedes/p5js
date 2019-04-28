@@ -4,9 +4,9 @@ class Ship {
 	this.pos = createVector(x, y);
 	this.vel = createVector(0, 0);
 	this.accel = createVector(0, 0);
-  this.mass = 0;
+    this.mass = 0;
 
-  this.unids = [];
+    this.unids = [];
 
 	// atributos para velocidade angular
 	this.theta = 0;
@@ -25,8 +25,8 @@ class Ship {
   totalMass(){
     var total = 0;
     this.unids.forEach( function(u){
-		  total += u.mass;
-		});
+	    total += u.mass;
+	});
     this.mass = total;
   }
 
