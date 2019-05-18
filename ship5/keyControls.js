@@ -16,27 +16,12 @@ document.addEventListener("keyup", function(event){
 	keys.splice( keys.indexOf(event.code) );
 });
 
-function action(){
-	keys.forEach( function(code){
-		switch(code){
-			case "KeyQ":
-				forcaAntiHorario.thrust = true;
-				break;
-			case "KeyE":
-				forcaHorario.thrust = true;
-				break;
-			case "KeyW":
-				forcaParaFrente.thrust = true;
-				break;
-			case "KeyS":
-				forcaParaTras.thrust = true;
-				break;
-			case "KeyD":
-				forcaLateralEsq.thrust = true;
-				break;
-			case "KeyA":
-				forcaLateralDir.thrust = true;
-				break;
+function action(obj, controls){
+	keys.forEach( function(key_code){
+		if(controls[key_code] != undefined){
+			controls[key_code].forEach( (engine) => {
+				engine.thrust = true;
+			});
 		}
 	});
 };

@@ -2,10 +2,23 @@
 <head>
 	<!-- <meta http-equiv="refresh" content="30">-->
 	<meta charset="utf-8">
+  <style>
+    #hud {
+      position:absolute; 
+      background-color: rgba(255, 0, 0, .5);
+      width: 400px;
+    }
+  </style>
 </head>
 <body>
-    <section id="window">
-            HUD
+    <section id="window" style="">
+      <div id="hud">
+        <div id="map" style="padding: 5px; background-color: #505050; height: 50px; width: 50px">
+          nothing
+        </div>
+        <h2>HUD</h2>
+        <button>Start</button>
+      </div>
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
@@ -16,7 +29,15 @@
     <script src="HUD.js"></script>
     <script src="Force.js"></script>
 
-	<script>
+<script>
+// HUD
+function setSizeHUD(x, y){
+  var elem_window = document.getElementById('hud');
+  elem_window.style.width = x+'px';
+  elem_window.style.height = y+'px';
+}
+
+
 // ---------
 function displayGrid(){
 	fill(100);
@@ -39,12 +60,16 @@ var forcaAntiHorario, forcaHorario,
 var forcas = [];
 var parcial;
 
+var controls = {};
+
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
 
 function setup(){
-  // size(800, 600);
-  createCanvas(800, 600);
+  let height = 800;
+  let width = 600;
+  createCanvas(width, height);
+  setSizeHUD(width, height);
 
   // obj 'ship' e a posição inicial
   obj = new Ship(width/2, height/2);
@@ -66,21 +91,33 @@ function setup(){
     [obj.cmX-20, 20*4, PI/2],
     [obj.cmX, -20, PI]
   ];
-  soft_propellers.forEach( function(pair){
-    let prop_control = new Prop_Control( pair[0], pair[1]);
-    prop_control.force.rotate(pair[2]);
+
+  soft_propellers.forEach( function(soft_prop){
+    let prop_control = new Control_Engine( soft_prop[0], soft_prop[1]);
+    prop_control.force.rotate(soft_prop[2]);
     obj.addUnity( prop_control );
   });
 
   var strong_propellers = [
     [obj.cmX, 20*5, 0]
   ]
-  strong_propellers.forEach( function(pair){
-    let engine = new Main_Engine( pair[0], pair[1]);
-    engine.force.rotate(pair[2]);
+  
+  strong_propellers.forEach( function(strong_prop){
+    let engine = new Main_Engine( strong_prop[0], strong_prop[1]);
+    engine.force.rotate(strong_prop[2]);
     obj.addUnity( engine );
   });
   
+  controls['KeyE'] = [];
+  controls['KeyE'].push(obj.unids[9]);
+  controls['KeyQ'] = [];
+  controls['KeyQ'].push(obj.unids[10]);
+  controls['KeyS'] = [];
+  controls['KeyS'].push(obj.unids[11]);
+
+  controls["KeyW"] = [];
+  controls["KeyW"].push(obj.unids[12]);
+
   //         force = constructor(x,    y, fx fy){
   forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
   forcas.push( forcaHorario  =  	new Force(0 * 20, 20, 0, -5));
@@ -91,8 +128,9 @@ function setup(){
   forcas.push( forcaParaTras = new Force(   obj.cmX, -20, 0, empuxo) );
   forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
   forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
+  //obj.unids[12].thrust=true;
 
-  frameRate(30);
+  frameRate(5);
 }
 
 var STOP = false;
@@ -106,7 +144,7 @@ function draw(){
       translate(width/2 - obj.pos.x, height/2-obj.pos.y);
       displayGrid();
     }
-	  action(obj);
+	  action(obj, controls);
 	  atualizaForca();
 	  obj.update();
 	  obj.display();
@@ -115,7 +153,7 @@ function draw(){
       pop();
     }
 	}
-
+  //STOP=true;
 }
 
 function pause(){
@@ -126,12 +164,11 @@ function pause(){
 function atualizaForca(){
 	forcas.forEach( function(f){
 		if(f.thrust){
-			obj.applyForce(f);
+			//obj.applyForce(f);
 		}
 	});
 }
 
 </script>
-
 </body>
 </html>

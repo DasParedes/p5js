@@ -14,10 +14,10 @@ class Propeller extends Unity {
 	}
 }
 
-class Prop_Control extends Propeller {
+class Control_Engine extends Propeller {
     constructor(x, y){
         var mass = 2;
-        var force = createVector(0, -1);
+        var force = createVector(0, -.1);
         super(x, y, mass, force);
     }
     
@@ -38,11 +38,14 @@ class Prop_Control extends Propeller {
         if(this.thrust){
         	fill(255, 100, 100);
         	beginShape();
-        	vertex(10,10);
-        	vertex(15,15);
-        	vertex(10, 20);
-        	vertex(5, 15);
-        	endShape();
+
+            vertex(0, 5);
+        	vertex(5,10);
+        	vertex(0,20);
+        	vertex(-5, 10);
+        	vertex(0, 5);
+        	
+            endShape();
       	}
       	pop();
     }
@@ -72,7 +75,7 @@ class Main_Engine extends Propeller {
         vertex(10, -10);
         endShape();
 
-        if(!this.thrust){
+        if(this.thrust){
         	fill(255, 100, 100);
         	beginShape();
         	/*
@@ -83,9 +86,9 @@ class Main_Engine extends Propeller {
         	curveVertex(0, 8);
         	*/
         	vertex(0, 8);
-        	vertex(10, 18);
+        	vertex(10, 14);
         	vertex( 0, 30);
-        	vertex(-10, 18);
+        	vertex(-10, 14);
         	vertex( 0, 8);
         	endShape();
       	}

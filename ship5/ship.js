@@ -4,9 +4,9 @@ class Ship {
 	this.pos = createVector(x, y);
 	this.vel = createVector(0, 0);
 	this.accel = createVector(0, 0);
-    this.mass = 0;
+  this.mass = 0;
 
-    this.unids = [];
+  this.unids = [];
 
 	// atributos para velocidade angular
 	this.theta = 0;
@@ -49,17 +49,25 @@ class Ship {
     this.center_of_mass = createVector(this.cmX, this.cmY);
   }
 
-  applyForce(force){
+  applyForce(f, pos){
     //  experimental
     //  force: Force;
     //    Force.pos: p5.Vector
     //    Force.force: p5.Vector
+    var force = new Force(pos.x, pos.y, f.x, f.y);
     var distance = p5.Vector.sub(this.center_of_mass, force.pos);
+  
+    console.log(distance.x);
 
     if (distance.mag() != 0){
       // angle between distance and the force
       var angleVector = distance.heading() + force.force.heading();
       
+      console.log(distance.heading())
+      console.log(force.force.heading());
+      console.log(angleVector);
+      console.log('-------------');
+
       var perpendicular_force = force.force.copy().normalize();
       perpendicular_force.rotate(angleVector + PI/2);
 
@@ -80,6 +88,15 @@ class Ship {
 
   // atualiza os atributos do obj / Component
   update(){
+    this.unids.forEach( (unity) => {
+      if( (unity instanceof Propeller)){
+        //console.log(unity);
+        if(unity.thrust){
+          this.applyForce(unity.force, unity.pos);
+        }
+      }
+    });
+    
     // atualiza posição e velocidade linear
   	this.vel.add( this.accel.rotate(this.theta));
   	this.pos.add( this.vel );
@@ -121,10 +138,12 @@ class Ship {
     ellipse(this.cmX, this.cmY, 5, 5);
 
     // imprime os jatos dos propulsores ativados
-    forcas.forEach( function(f){
-      if(f.thrust){
-        f.display();
-        f.thrust = false;
+    this.unids.forEach( (unity) => {
+      if( (unity instanceof Propeller)){
+        if(unity.thrust){
+          unity.display();
+          unity.thrust=false;
+        }
       }
     });
 

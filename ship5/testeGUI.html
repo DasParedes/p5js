@@ -41,6 +41,13 @@ class Button{
 		this.g = 100;
 		this.b = 100;
 	}
+
+	// 
+	mouseHover(){
+		this.r = 150;
+		this.g = 150;
+		this.b = 150;
+	}
 }
 
 class Component{
@@ -81,6 +88,7 @@ class HUD {
 	constructor(){
 		this.actual = null;
 		this.lista = [];
+		this.mouseHover = [];
 	}
 
 	addAba(obj){
@@ -98,6 +106,14 @@ class HUD {
 	display(){
 		if( this.actual ){
 			this.actual.display();
+		}
+	}
+
+	mouseOver(){
+		let target = this.isInside();
+		this.mouseHover.indexOf(target);
+		if (target != null){
+			target.mouseHover();
 		}
 	}
 }
@@ -167,6 +183,7 @@ function setup(){
 
 function draw(){
 	background(55);
+	hud.mouseOver();
 	hud.display();
 }
 
