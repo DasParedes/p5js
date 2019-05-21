@@ -64,6 +64,7 @@ var controls = {};
 
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
+var FPS = 20;
 
 function setup(){
   let height = 800;
@@ -99,7 +100,9 @@ function setup(){
   });
 
   var strong_propellers = [
-    [obj.cmX, 20*5, 0]
+    [obj.cmX, 20*5, 0],
+    [20*0      , 20, 0],
+    [20*4   , 20, 0]
   ]
   
   strong_propellers.forEach( function(strong_prop){
@@ -116,7 +119,9 @@ function setup(){
   controls['KeyS'].push(obj.unids[11]);
 
   controls["KeyW"] = [];
-  controls["KeyW"].push(obj.unids[12]);
+//  controls["KeyW"].push(obj.unids[12]);
+  controls["KeyW"].push(obj.unids[13]);
+  controls["KeyW"].push(obj.unids[14]);
 
   //         force = constructor(x,    y, fx fy){
   forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
@@ -130,7 +135,7 @@ function setup(){
   forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
   //obj.unids[12].thrust=true;
 
-  frameRate(5);
+  frameRate(FPS);
 }
 
 var STOP = false;

@@ -56,32 +56,31 @@ class Ship {
     //    Force.force: p5.Vector
     var force = new Force(pos.x, pos.y, f.x, f.y);
     var distance = p5.Vector.sub(this.center_of_mass, force.pos);
-  
-    console.log(distance.x);
 
     if (distance.mag() != 0){
+      var diff_angle = (distance.heading() - force.force.heading()) % 180;
+      console.log(diff_angle);
+      var perpendicular_distance = distance.copy().rotate(PI/2 + diff_angle).normalize();
+
       // angle between distance and the force
-      var angleVector = distance.heading() + force.force.heading();
+      var angleVector = 90 - abs(distance.heading() - force.force.heading());
       
-      console.log(distance.heading())
-      console.log(force.force.heading());
-      console.log(angleVector);
-      console.log('-------------');
 
-      var perpendicular_force = force.force.copy().normalize();
-      perpendicular_force.rotate(angleVector + PI/2);
-
-      perpendicular_force.mult(sin(angleVector) * force.force.mag());
+      var perpendicular_force = perpendicular_distance.mult(force.force.mag());
 
       var rotacional_force = perpendicular_force.mag() * distance.mag();
 
       // pra arrumar a direção da rotação. 
       // p5.Vector.angleBetween() não faz distinção horário ou anti-horário
-      rotacional_force *= angleVector / Math.abs(angleVector);
 
-      this.accelAng -= rotacional_force / (this.mass * PI * distance.mag());
+      rotacional_force *= diff_angle == 0 ? 0 : diff_angle / Math.abs(diff_angle);
+      console.log( rotacional_force );
+
+      this.accelAng += rotacional_force / (this.mass * PI * distance.mag());
+
     }
-
+      console.log(this.accelAng);
+    console.log(force.force.mag());
     // Linear Acceleration = a = f /m;
     this.accel.add( p5.Vector.div(force.force, this.mass));
   }
@@ -92,6 +91,7 @@ class Ship {
       if( (unity instanceof Propeller)){
         //console.log(unity);
         if(unity.thrust){
+            console.log(unity);
           this.applyForce(unity.force, unity.pos);
         }
       }
