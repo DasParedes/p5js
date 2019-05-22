@@ -58,29 +58,43 @@ class Ship {
     var distance = p5.Vector.sub(this.center_of_mass, force.pos);
 
     if (distance.mag() != 0){
-      var diff_angle = (distance.heading() - force.force.heading()) % 180;
-      console.log(diff_angle);
-      var perpendicular_distance = distance.copy().rotate(PI/2 + diff_angle).normalize();
+      // https://pt.wikipedia.org/wiki/Proje%C3%A7%C3%A3o_de_um_vetor
+
+      var diff_angle = (distance.heading() + force.force.heading()) % 180;
+      var total_angle = (distance.heading() - force.force.heading()) % 180;
+
+      // this work to the main Engines
+      var module_force = diff_angle == 0 ? 1 : diff_angle / Math.abs(diff_angle);
+
+      // this work to the laterals motors
+      //var module_force = total_angle == 0 ? 1 : total_angle / Math.abs(total_angle);
+
+      var perpendicular_distance = distance.copy().rotate(PI/2).normalize();
+      var angle = perpendicular_distance.angleBetween(force.force);
+
+      console.log('diff: ' + diff_angle);
+      console.log('total: ' + total_angle);
+      console.log('angle: ' + angle);
 
       // angle between distance and the force
       var angleVector = 90 - abs(distance.heading() - force.force.heading());
       
-
       var perpendicular_force = perpendicular_distance.mult(force.force.mag());
 
-      var rotacional_force = perpendicular_force.mag() * distance.mag();
+      var rotacional_force = perpendicular_force.mag() * distance.mag() * module_force;
 
       // pra arrumar a direção da rotação. 
-      // p5.Vector.angleBetween() não faz distinção horário ou anti-horário
+      // p5.Vector.angleBetween() não faz distinção horário ou anti-horário      
 
-      rotacional_force *= diff_angle == 0 ? 0 : diff_angle / Math.abs(diff_angle);
-      console.log( rotacional_force );
+      console.log('rotate force: ' + rotacional_force );
 
       this.accelAng += rotacional_force / (this.mass * PI * distance.mag());
 
     }
-      console.log(this.accelAng);
-    console.log(force.force.mag());
+    console.log('accelAng: ' + this.accelAng);
+    console.log('force.mag: ' + force.force.mag());
+    console.log('-----------------');
+
     // Linear Acceleration = a = f /m;
     this.accel.add( p5.Vector.div(force.force, this.mass));
   }
@@ -96,7 +110,7 @@ class Ship {
         }
       }
     });
-    
+    console.log('=====================');
     // atualiza posição e velocidade linear
   	this.vel.add( this.accel.rotate(this.theta));
   	this.pos.add( this.vel );
