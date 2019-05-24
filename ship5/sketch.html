@@ -88,40 +88,38 @@ function setup(){
   // propulsores e localização
   var soft_propellers = [
   // pos.x, pos.y, rotate
-    [obj.cmX+20, 20*4, -PI/2],
-    [obj.cmX-20, 20*4, PI/2],
-    [obj.cmX, -20, PI]
+    [obj.cmX+20, 20*4, -PI/2, 'KeyE'],
+    [obj.cmX-20, 20*4, PI/2, 'KeyQ'],
+    [obj.cmX, -20, PI, 'KeyS']
   ];
 
   soft_propellers.forEach( function(soft_prop){
     let prop_control = new Control_Engine( soft_prop[0], soft_prop[1]);
     prop_control.force.rotate(soft_prop[2]);
     obj.addUnity( prop_control );
+
+    if( controls[soft_prop[3]] == undefined) {
+      controls[soft_prop[3]] = [];
+    }
+    controls[ soft_prop[3] ].push(prop_control);  
   });
 
   var strong_propellers = [
-    [obj.cmX, 20*5, 0],
-    [20*0      , 20, 0],
-    [20*4   , 20, 0]
+    [obj.cmX, 20*5, 0, 'KeyW'],
+    [20*0      , 20, 0, 'KeyW'],
+    [20*4   , 20, 0, 'KeyW']
   ]
   
   strong_propellers.forEach( function(strong_prop){
     let engine = new Main_Engine( strong_prop[0], strong_prop[1]);
     engine.force.rotate(strong_prop[2]);
     obj.addUnity( engine );
-  });
-  
-  controls['KeyE'] = [];
-  controls['KeyE'].push(obj.unids[9]);
-  controls['KeyQ'] = [];
-  controls['KeyQ'].push(obj.unids[10]);
-  controls['KeyS'] = [];
-  controls['KeyS'].push(obj.unids[11]);
 
-  controls["KeyW"] = [];
-//  controls["KeyW"].push(obj.unids[12]);
-  controls["KeyW"].push(obj.unids[13]);
-  controls["KeyW"].push(obj.unids[14]);
+    if( controls[strong_prop[3]] == undefined) {
+      controls[strong_prop[3]] = [];
+    }
+    controls[ strong_prop[3] ].push(engine);  
+  });
 
   //         force = constructor(x,    y, fx fy){
   forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
