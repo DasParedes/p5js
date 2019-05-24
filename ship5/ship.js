@@ -1,3 +1,5 @@
+const DEBUG = false;
+
 class Ship {
   constructor(x, y){
 	// atributos para velocidade 'linear'
@@ -49,6 +51,30 @@ class Ship {
     this.center_of_mass = createVector(this.cmX, this.cmY);
   }
 
+  perpendicular_force(f, p){
+    let force = null;
+    
+    p = p.copy().normalize();
+    let p2 = p.copy().rotate(PI/2);
+
+    let escalar_product = f.x * p2.x + f.y * p2.y;
+    let f2 = p5.Vector.mult(p2, escalar_product / pow(p2.mag(), 2) );
+    force = f2;
+    
+    if (DEBUG){
+      console.log('px : %f, py : %f', p.x, p.y);  
+      console.log('p2x: %f, p2y: %f', p2.x, p2.y);
+
+      console.log("f''x:%f, f''y:%f", f2.x, f2.y);
+      console.log('p2 and f angle: %f', p2.angleBetween(f));  
+      
+      console.log('force angle: %f', force.heading());
+      console.log('pos. angle: %f', p.heading());
+      console.log('pos.2 angle: %f', p2.heading());
+    }
+    return force;
+  }
+
   applyForce(f, pos){
     //  experimental
     //  force: Force;
@@ -60,11 +86,29 @@ class Ship {
     if (distance.mag() != 0){
       // https://pt.wikipedia.org/wiki/Proje%C3%A7%C3%A3o_de_um_vetor
 
-      var diff_angle = (distance.heading() + force.force.heading()) % 180;
+      var final_angle = (distance.heading() + distance.angleBetween(force.force));
       var total_angle = (distance.heading() - force.force.heading()) % 180;
+      var diff_angle = 0;
 
+      console.log(distance.heading());
+      console.log(distance.angleBetween(force.force));
+      console.log(force.force.heading());
+      
       // this work to the main Engines
-      var module_force = diff_angle == 0 ? 1 : diff_angle / Math.abs(diff_angle);
+      let d_angle = distance.heading();
+      let f_angle = force.force.heading();
+
+      
+      if(sin(f_angle - d_angle) < 0){
+        var module_force = 1;
+      } else 
+      if (sin(f_angle - d_angle) > 0){
+        var module_force =-1;
+      } else {
+        var module_force = 0;
+      }
+
+      
 
       // this work to the laterals motors
       //var module_force = total_angle == 0 ? 1 : total_angle / Math.abs(total_angle);
@@ -79,8 +123,8 @@ class Ship {
       // angle between distance and the force
       var angleVector = 90 - abs(distance.heading() - force.force.heading());
       
-      var perpendicular_force = perpendicular_distance.mult(force.force.mag());
-
+      var perpendicular_force = this.perpendicular_force(force.force, perpendicular_distance);
+      console.log(perpendicular_force);
       var rotacional_force = perpendicular_force.mag() * distance.mag() * module_force;
 
       // pra arrumar a direção da rotação. 
