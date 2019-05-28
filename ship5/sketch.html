@@ -52,13 +52,7 @@ function displayGrid(){
 
 var SCALE = 50;
 
-var obj;
-var forcaAntiHorario, forcaHorario,
-	forcaParaFrente, forcaParaTras,
-	forcaLateralEsq, forcaLateralDir;
-
-var forcas = [];
-var parcial;
+var ship;
 
 var controls = {};
 
@@ -73,66 +67,9 @@ function setup(){
   setSizeHUD(width, height);
 
   // obj 'ship' e a posição inicial
-  obj = new Ship(width/2, height/2);
-
-  // adiciona as diversas unidades ao obj
-  // linha de comprimento 5
-  for(var i=0; i<5; i++){
-    obj.addUnity( new Unity(i * 20, 0, 20) );
-  }
-  // coluna de comprimento 4
-  for(var i=1; i<5; i++){
-    obj.addUnity( new Unity(2 * 20, i * 20, 20) );
-  }
+  ship = new Ship(width/2, height/2);
+  pre_build_ship(ship, controls);
   
-  // propulsores e localização
-  var soft_propellers = [
-  // pos.x, pos.y, rotate
-    [obj.cmX+20, 20*4, -PI/2, 'KeyE'],
-    [obj.cmX-20, 20*4, PI/2, 'KeyQ'],
-    [obj.cmX, -20, PI, 'KeyS']
-  ];
-
-  soft_propellers.forEach( function(soft_prop){
-    let prop_control = new Control_Engine( soft_prop[0], soft_prop[1]);
-    prop_control.force.rotate(soft_prop[2]);
-    obj.addUnity( prop_control );
-
-    if( controls[soft_prop[3]] == undefined) {
-      controls[soft_prop[3]] = [];
-    }
-    controls[ soft_prop[3] ].push(prop_control);  
-  });
-
-  var strong_propellers = [
-    [obj.cmX, 20*5, 0, 'KeyW'],
-    [20*0      , 20, 0, 'KeyW'],
-    [20*4   , 20, 0, 'KeyW']
-  ]
-  
-  strong_propellers.forEach( function(strong_prop){
-    let engine = new Main_Engine( strong_prop[0], strong_prop[1]);
-    engine.force.rotate(strong_prop[2]);
-    obj.addUnity( engine );
-
-    if( controls[strong_prop[3]] == undefined) {
-      controls[strong_prop[3]] = [];
-    }
-    controls[ strong_prop[3] ].push(engine);  
-  });
-
-  //         force = constructor(x,    y, fx fy){
-  forcas.push( forcaAntiHorario = new Force(4 * 20, 20, 0, -5));
-  forcas.push( forcaHorario  =  	new Force(0 * 20, 20, 0, -5));
-
-  var empuxo = 10;
-
-  forcas.push( forcaParaFrente = new Force( obj.cmX, 5*20, 0, -empuxo*2) )
-  forcas.push( forcaParaTras = new Force(   obj.cmX, -20, 0, empuxo) );
-  forcas.push( forcaLateralEsq = new Force(  obj.cmX, obj.cmY, empuxo, 0) );
-  forcas.push( forcaLateralDir = new Force(  obj.cmX, obj.cmY, -empuxo, 0) );
-  //obj.unids[12].thrust=true;
-
   frameRate(FPS);
 }
 
@@ -144,13 +81,13 @@ function draw(){
 
     if (CENTER_CAMERA){
       push();
-      translate(width/2 - obj.pos.x, height/2-obj.pos.y);
+      translate(width/2 - ship.pos.x, height/2-ship.pos.y);
       displayGrid();
     }
-	  action(obj, controls);
-	  atualizaForca();
-	  obj.update();
-	  obj.display();
+	  action(ship, controls);
+	  
+	  ship.update();
+	  ship.display();
 
     if (CENTER_CAMERA){
       pop();
@@ -163,14 +100,6 @@ function pause(){
 	STOP = !STOP;
  }
 
-// arrumar depois.
-function atualizaForca(){
-	forcas.forEach( function(f){
-		if(f.thrust){
-			//obj.applyForce(f);
-		}
-	});
-}
 
 </script>
 </body>
