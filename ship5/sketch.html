@@ -43,21 +43,29 @@ function setSizeHUD(x, y){
 
 // ---------
 function displayGrid(topX, topY, width, height, velocity){
-    var left_start = topX - topX%SCALE - SCALE; 
-	var top_start = topY - topY%SCALE - SCALE;
-	
-    fill('#2222aa');
-    rect(top_start, left_start, 50,50);
-  
+    // grid of squares with regular size
+    var local_scale = 50; 
+    
+    // grid of squares with size distorced by velocity.
+    //local_scale = SCALE + velocity*2;
+    
+    var left_start = topX - topX%local_scale - local_scale; 
+	var top_start = topY - topY%local_scale - local_scale;
+	  
 	fill(100);
 	stroke(100);
 	
-	for(var i=0; i<height + 100; i+= 50+velocity){
-		line(left_start, top_start + i, left_start + width + 100, top_start + i);
+	var middle_height = top_start + (height/2);
+	var middle_width = left_start + (width/2);
+	
+	for(var i=0; i<height/2 + 100; i+= local_scale){
+	    line(left_start, middle_height + i, left_start + width + 100, middle_height + i);
+    	line(left_start, middle_height - i, left_start + width + 100, middle_height - i);
 	}
 	
-	for(var j=0; j<width + 100; j+=50+velocity){
-    	line(left_start + j, top_start, left_start + j, top_start + height + 100);
+	for(var j=0; j<width/2 + 100; j+= local_scale){
+    	line(middle_width + j, top_start, middle_width + j, top_start + height + local_scale);
+    	line(middle_width - j, top_start, middle_width - j, top_start + height + local_scale);
 	}
 }
 
@@ -88,23 +96,29 @@ function setup(){
 var STOP = false;
 
 function draw(){
-	if(!STOP){
+  var copy_accel = ship.accel.copy();
+  if(!STOP){
 	  background(200);
+
 
     if (CENTER_CAMERA){
       push();
       translate(width/2 - ship.pos.x, height/2-ship.pos.y);
-      displayGrid(ship.pos.x-(width/2), ship.pos.y-(height/2), width, height, ship.vel.mag());
+
     }
 	  action(ship, controls);
 	  
 	  ship.update();
-	  ship.display();
+      displayGrid(ship.pos.x-(width/2), ship.pos.y-(height/2), width, height, ship.vel.mag());
+      copy_accel = ship.accel.copy();
+      ship.display();
 
     if (CENTER_CAMERA){
       pop();
     }
-	}
+  }
+  
+  info(ship, copy_accel);
   //STOP=true;
 }
 
@@ -112,6 +126,32 @@ function pause(){
 	STOP = !STOP;
  }
 
+function info(obj, copy_accel){
+    fill(200);
+    rect(0, 0, 100, 200);
+    fill(20);
+    text('velocity', 25, 10);
+    fill(200);
+    ellipse(50, 50, 50);
+    strokeWeight(2);
+    line(50, 50, 50+obj.vel.x, 50+obj.vel.y);
+    
+    noFill();
+    strokeWeight(5);
+    if (obj.velAng < 0)
+        arc(50, 50, 60, 60, PI/2 + obj.velAng, PI/2);
+    else
+    if (obj.velAng > 0)
+        arc(50, 50, 60, 60, PI/2, PI/2 + obj.velAng);
+    strokeWeight(1);
+    
+    fill(20);
+    text('acceleration', 10, 100);
+    fill(200);
+    ellipse(50, 150, 50);
+    var accel = copy_accel.copy().normalize()*50;
+    line(50, 150, 50+accel.x, 150+accel.y);
+}
 
 </script>
 </body>

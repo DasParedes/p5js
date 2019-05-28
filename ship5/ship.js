@@ -186,9 +186,6 @@ class Ship {
   	this.velAng += this.accelAng;
     this.theta += this.velAng;
 
-    // reseta a aceleração linear e angular
-    this.accel.mult(0);
-  	this.accelAng = 0;
   }
 
   // mostra na tela todos as partes do objeto
@@ -229,5 +226,9 @@ class Ship {
     });
 
     pop();
+    
+    // reseta a aceleração linear e angular
+    this.accel.mult(0);
+  	this.accelAng = 0;
   }
 }
