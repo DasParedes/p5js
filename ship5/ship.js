@@ -1,5 +1,56 @@
 const DEBUG = false;
 
+function pre_build_ship(ship, controls){
+  // adiciona as diversas unidades estruturais a nave
+  // linha de comprimento 5
+  for(var i=0; i<5; i++){
+    ship.addUnity( new Unity(i * 20, 0, 20) );
+  }
+  // coluna de comprimento 4
+  for(var i=1; i<5; i++){
+    ship.addUnity( new Unity(2 * 20, i * 20, 20) );
+  }
+  
+  // propulsores e localização
+  var soft_propellers = [
+  // pos.x, pos.y, rotate, atuador
+    [ship.cmX+20, 20*4, -PI/2, 'KeyE'],
+    [ship.cmX-20, 20*4, PI/2, 'KeyQ'],
+    [ship.cmX, -20, PI, 'KeyS'],
+    [ship.cmX-20, 20*1, PI/2, 'KeyA'],
+    [ship.cmX+20, 20*1, -PI/2, 'KeyD'],
+  ];
+
+  soft_propellers.forEach( function(soft_prop){
+    let prop_control = new Control_Engine( soft_prop[0], soft_prop[1]);
+    prop_control.force.rotate(soft_prop[2]);
+    ship.addUnity( prop_control );
+
+    if( controls[soft_prop[3]] == undefined) {
+      controls[soft_prop[3]] = [];
+    }
+    controls[ soft_prop[3] ].push(prop_control);  
+  });
+
+  var strong_propellers = [
+    [ship.cmX, 20*5, 0, 'KeyW'],
+    [20*0      , 20, 0, 'KeyW'],
+    [20*4   , 20, 0, 'KeyW']
+  ]
+  
+  strong_propellers.forEach( function(strong_prop){
+    let engine = new Main_Engine( strong_prop[0], strong_prop[1]);
+    engine.force.rotate(strong_prop[2]);
+    ship.addUnity( engine );
+
+    if( controls[strong_prop[3]] == undefined) {
+      controls[strong_prop[3]] = [];
+    }
+    controls[ strong_prop[3] ].push(engine);  
+  });
+}
+
+
 class Ship {
   constructor(x, y){
 	// atributos para velocidade 'linear'
@@ -8,14 +59,13 @@ class Ship {
 	this.accel = createVector(0, 0);
   this.mass = 0;
 
+  // all parts that compose the ship
   this.unids = [];
 
 	// atributos para velocidade angular
 	this.theta = 0;
 	this.velAng = 0;
 	this.accelAng = 0;
-
-  // this.unitysInteracts = [];
   }
 
   addUnity(u){
@@ -28,7 +78,7 @@ class Ship {
     var total = 0;
     this.unids.forEach( function(u){
 	    total += u.mass;
-	});
+	  });
     this.mass = total;
   }
 
@@ -57,7 +107,7 @@ class Ship {
     p = p.copy().normalize();
     let p2 = p.copy().rotate(PI/2);
 
-    let escalar_product = f.x * p2.x + f.y * p2.y;
+    let escalar_product = (f.x * p2.x) + (f.y * p2.y);
     let f2 = p5.Vector.mult(p2, escalar_product / pow(p2.mag(), 2) );
     force = f2;
     
@@ -85,59 +135,31 @@ class Ship {
 
     if (distance.mag() != 0){
       // https://pt.wikipedia.org/wiki/Proje%C3%A7%C3%A3o_de_um_vetor
-
-      var final_angle = (distance.heading() + distance.angleBetween(force.force));
-      var total_angle = (distance.heading() - force.force.heading()) % 180;
-      var diff_angle = 0;
-
-      console.log(distance.heading());
-      console.log(distance.angleBetween(force.force));
-      console.log(force.force.heading());
       
       // this work to the main Engines
-      let d_angle = distance.heading();
-      let f_angle = force.force.heading();
-
+      let dist_angle = distance.heading();
+      let force_angle = force.force.heading();
       
-      if(sin(f_angle - d_angle) < 0){
+      if(sin(force_angle - dist_angle) < 0){
         var module_force = 1;
       } else 
-      if (sin(f_angle - d_angle) > 0){
+      if (sin(force_angle - dist_angle) > 0){
         var module_force =-1;
       } else {
         var module_force = 0;
       }
 
+      //let perpendicular_distance = distance.copy().rotate(PI/2).normalize();
       
-
-      // this work to the laterals motors
-      //var module_force = total_angle == 0 ? 1 : total_angle / Math.abs(total_angle);
-
-      var perpendicular_distance = distance.copy().rotate(PI/2).normalize();
-      var angle = perpendicular_distance.angleBetween(force.force);
-
-      console.log('diff: ' + diff_angle);
-      console.log('total: ' + total_angle);
-      console.log('angle: ' + angle);
-
-      // angle between distance and the force
-      var angleVector = 90 - abs(distance.heading() - force.force.heading());
+      //let perpendicular_force = this.perpendicular_force(force.force, perpendicular_distance);
+      let perpendicular_force = this.perpendicular_force(force.force, distance);
       
-      var perpendicular_force = this.perpendicular_force(force.force, perpendicular_distance);
-      console.log(perpendicular_force);
-      var rotacional_force = perpendicular_force.mag() * distance.mag() * module_force;
+      let rotacional_force = perpendicular_force.mag() * pow(distance.mag(), 2) * module_force;
 
-      // pra arrumar a direção da rotação. 
-      // p5.Vector.angleBetween() não faz distinção horário ou anti-horário      
-
-      console.log('rotate force: ' + rotacional_force );
-
-      this.accelAng += rotacional_force / (this.mass * PI * distance.mag());
-
+      var escala = 1000;
+      // Update rotate acceleration
+      this.accelAng += rotacional_force / (this.mass * PI * escala); //* distance.mag());
     }
-    console.log('accelAng: ' + this.accelAng);
-    console.log('force.mag: ' + force.force.mag());
-    console.log('-----------------');
 
     // Linear Acceleration = a = f /m;
     this.accel.add( p5.Vector.div(force.force, this.mass));
@@ -147,14 +169,15 @@ class Ship {
   update(){
     this.unids.forEach( (unity) => {
       if( (unity instanceof Propeller)){
-        //console.log(unity);
+
         if(unity.thrust){
             console.log(unity);
           this.applyForce(unity.force, unity.pos);
         }
+
       }
     });
-    console.log('=====================');
+    
     // atualiza posição e velocidade linear
   	this.vel.add( this.accel.rotate(this.theta));
   	this.pos.add( this.vel );
