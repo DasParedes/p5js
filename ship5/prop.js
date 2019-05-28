@@ -17,7 +17,7 @@ class Propeller extends Unity {
 class Control_Engine extends Propeller {
     constructor(x, y){
         var mass = 2;
-        var force = createVector(0, -.1);
+        var force = createVector(0, -1);
         super(x, y, mass, force);
     }
     
