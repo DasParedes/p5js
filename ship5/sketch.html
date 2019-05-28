@@ -12,12 +12,15 @@
 </head>
 <body>
     <section id="window" style="">
+    
       <div id="hud">
+      <!--
         <div id="map" style="padding: 5px; background-color: #505050; height: 50px; width: 50px">
           nothing
         </div>
         <h2>HUD</h2>
         <button>Start</button>
+        -->
       </div>
     </section>
 
@@ -39,14 +42,22 @@ function setSizeHUD(x, y){
 
 
 // ---------
-function displayGrid(){
+function displayGrid(topX, topY, width, height, velocity){
+    var left_start = topX - topX%SCALE - SCALE; 
+	var top_start = topY - topY%SCALE - SCALE;
+	
+    fill('#2222aa');
+    rect(top_start, left_start, 50,50);
+  
 	fill(100);
 	stroke(100);
-	for(var i=0; i<height; i+= 50){
-		line(0, i, width, i);
+	
+	for(var i=0; i<height + 100; i+= 50+velocity){
+		line(left_start, top_start + i, left_start + width + 100, top_start + i);
 	}
-	for(var j=0; j<width; j+=50){
-		line(j, 0, j, height);
+	
+	for(var j=0; j<width + 100; j+=50+velocity){
+    	line(left_start + j, top_start, left_start + j, top_start + height + 100);
 	}
 }
 
@@ -59,10 +70,11 @@ var controls = {};
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
 var FPS = 20;
-
-function setup(){
   let height = 800;
   let width = 600;
+  
+function setup(){
+
   createCanvas(width, height);
   setSizeHUD(width, height);
 
@@ -82,7 +94,7 @@ function draw(){
     if (CENTER_CAMERA){
       push();
       translate(width/2 - ship.pos.x, height/2-ship.pos.y);
-      displayGrid();
+      displayGrid(ship.pos.x-(width/2), ship.pos.y-(height/2), width, height, ship.vel.mag());
     }
 	  action(ship, controls);
 	  
