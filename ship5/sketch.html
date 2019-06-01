@@ -3,6 +3,9 @@
 	<!-- <meta http-equiv="refresh" content="30">-->
 	<meta charset="utf-8">
   <style>
+    body {
+      background-color: rgba(10, 0, 0);
+    }
     #hud {
       position:absolute; 
       background-color: rgba(255, 0, 0, .5);
@@ -31,6 +34,7 @@
     <script src="prop.js"></script>
     <script src="HUD.js"></script>
     <script src="Force.js"></script>
+    <script src="Planet.js"></script>
 
 <script>
 // HUD
@@ -58,12 +62,12 @@ function displayGrid(topX, topY, width, height, velocity){
 	var middle_height = top_start + (height/2);
 	var middle_width = left_start + (width/2);
 	
-	for(var i=0; i<height/2 + 100; i+= local_scale){
+	for(var i= local_scale/2; i<height/2 + 100; i+= local_scale){
 	    line(left_start, middle_height + i, left_start + width + 100, middle_height + i);
     	line(left_start, middle_height - i, left_start + width + 100, middle_height - i);
 	}
 	
-	for(var j=0; j<width/2 + 100; j+= local_scale){
+	for(var j=local_scale/2; j<width/2 + 100; j+= local_scale){
     	line(middle_width + j, top_start, middle_width + j, top_start + height + local_scale);
     	line(middle_width - j, top_start, middle_width - j, top_start + height + local_scale);
 	}
@@ -75,50 +79,48 @@ var ship;
 
 var controls = {};
 
+var planets = [];
+
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
-var FPS = 20;
-  let height = 800;
-  let width = 600;
-  
+var FPS = 24;
+
+let height = 600;
+let width = 800;
+
 function setup(){
 
   createCanvas(width, height);
   setSizeHUD(width, height);
 
   // obj 'ship' e a posição inicial
-  ship = new Ship(width/2, height/2);
+  ship = new Ship(400+width/2, height/2);
   pre_build_ship(ship, controls);
   
+  planets.push(new Planet(1000, 400, 400, 500, '#22ffaa'));
+  planets.push(new Planet(600, 400, 100, 100, '#22dd22', planets[0]));
   frameRate(FPS);
+  console.log(planets);
 }
 
 var STOP = false;
+var GAME_MODE = 1;
 
 function draw(){
-  var copy_accel = ship.accel.copy();
-  if(!STOP){
-	  background(200);
-
-
-    if (CENTER_CAMERA){
-      push();
-      translate(width/2 - ship.pos.x, height/2-ship.pos.y);
-
-    }
-	  action(ship, controls);
-	  
-	  ship.update();
-      displayGrid(ship.pos.x-(width/2), ship.pos.y-(height/2), width, height, ship.vel.mag());
-      copy_accel = ship.accel.copy();
-      ship.display();
-
-    if (CENTER_CAMERA){
-      pop();
-    }
+  switch(GAME_MODE){
+    case 0:
+      menu();
+      break;
+    case 1:
+      game_loop();
+      break;
+    case 2:
+      pause_game();
+      break;
+    case 3:
+      config_menu();
+      break;
   }
-  
-  info(ship, copy_accel);
   //STOP=true;
 }
 
@@ -126,11 +128,60 @@ function pause(){
 	STOP = !STOP;
  }
 
+function menu(){
+  strokeWeight(0);
+  fill(255);
+  text('Menu Inicial', 50, 100);
+}
+
+function game_loop(){
+  var copy_accel = ship.accel.copy();
+  background(200);
+
+    ship.clean_accelerations();
+    
+    action(ship, controls);
+    
+    planets.forEach( (planet) => {
+      //if (p5.Vector.sub(planet.pos, ship.pos).mag() < 1000){
+      planet.update();
+      ship.apply_force(planet.force_attraction(ship));
+      ship.collision(planet);
+      //}
+    });
+    
+    ship.update();
+
+    if (CENTER_CAMERA){
+      push();
+      translate(width/2 - ship.pos.x, height/2-ship.pos.y);
+    }
+
+    displayGrid(ship.pos.x-(width/2), ship.pos.y-(height/2), width, height, ship.vel.mag());
+    copy_accel = ship.accel.copy();
+
+    planets.forEach( (planet) => {
+      planet.display();
+    });
+
+    ship.display();
+
+    if (CENTER_CAMERA){
+      pop();
+    }
+    info(ship, copy_accel);
+}
+
 function info(obj, copy_accel){
     fill(200);
-    rect(0, 0, 100, 200);
+    rect(0, 0, 100, 250);
     fill(20);
+    
+    strokeWeight(0);
     text('velocity', 25, 10);
+    text(obj.vel.mag().toFixed(2)+'ms/s', 25, 20);
+
+    strokeWeight(2);
     fill(200);
     ellipse(50, 50, 50);
     strokeWeight(2);
@@ -139,18 +190,41 @@ function info(obj, copy_accel){
     noFill();
     strokeWeight(5);
     if (obj.velAng < 0)
-        arc(50, 50, 60, 60, PI/2 + obj.velAng, PI/2);
+      arc(50, 50, 60, 60, PI/2 + obj.velAng, PI/2);
     else
     if (obj.velAng > 0)
-        arc(50, 50, 60, 60, PI/2, PI/2 + obj.velAng);
-    strokeWeight(1);
+      arc(50, 50, 60, 60, PI/2, PI/2 + obj.velAng);
+    else
+      arc(50, 50, 60, 60, PI/2, PI/2+.001);
     
+    strokeWeight(0);
     fill(20);
-    text('acceleration', 10, 100);
+    text('acceleration', 12, 100);
+    text(copy_accel.mag().toFixed(3)+'ms/s²', 25, 110);
+
+    strokeWeight(2);
     fill(200);
     ellipse(50, 150, 50);
-    var accel = copy_accel.copy().normalize()*50;
+    var accel = copy_accel.copy().normalize().mult(25);
     line(50, 150, 50+accel.x, 150+accel.y);
+    
+    strokeWeight(0);
+    fill(20);
+    text('altitude:', 12, 200);
+    var closer_planet = undefined;
+    planets.forEach( (planet) => {
+      if(closer_planet == undefined 
+        || p5.Vector.sub(ship.pos, planet.pos).mag() < p5.Vector.sub(ship.pos, closer_planet.pos).mag()){
+        closer_planet = planet;
+      }
+    });
+    var altitude = p5.Vector.sub(ship.pos, closer_planet.pos).mag() - closer_planet.size/2;
+    if(altitude > 1000)
+      text((altitude/1000).toFixed(1)+'km',12, 210);
+    else
+      text(altitude.toFixed(1)+'m',12, 210);  
+    
+    strokeWeight(1);
 }
 
 </script>

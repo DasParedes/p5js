@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 function pre_build_ship(ship, controls){
   // adiciona as diversas unidades estruturais a nave
@@ -57,6 +57,9 @@ class Ship {
 	this.pos = createVector(x, y);
 	this.vel = createVector(0, 0);
 	this.accel = createVector(0, 0);
+  this.thrust_accel = createVector(0, 0);
+  this.off_set = createVector(0, 0);
+
   this.mass = 0;
 
   // all parts that compose the ship
@@ -99,6 +102,9 @@ class Ship {
     this.cmY = cmy_ / mt;
 
     this.center_of_mass = createVector(this.cmX, this.cmY);
+
+    this.off_set = p5.Vector.sub(this.pos, this.center_of_mass);
+    //this.pos = this.center_of_mass;
   }
 
   perpendicular_force(f, p){
@@ -125,7 +131,13 @@ class Ship {
     return force;
   }
 
-  applyForce(f, pos){
+  apply_force(force){
+    // f = m * a
+    // acceleration = force / mass
+    this.accel.add( force.div(this.mass));
+  }
+
+  apply_thrust(f, pos){
     //  experimental
     //  force: Force;
     //    Force.pos: p5.Vector
@@ -162,30 +174,45 @@ class Ship {
     }
 
     // Linear Acceleration = a = f /m;
-    this.accel.add( p5.Vector.div(force.force, this.mass));
+    this.thrust_accel.add( p5.Vector.div(force.force, this.mass));
+  }
+
+  collision(obj){
+    if(p5.Vector.sub(this.pos, obj.pos).add(this.vel).mag() < obj.size/2){
+      console.log("I'm inside");
+      this.vel.mult(0);
+      this.accel.mult(0);
+    }
+  }
+
+  clean_accelerations(){
+    // reseta a aceleração linear e angular
+    this.accel.mult(0);
+    this.accelAng = 0;
+    this.thrust_accel = createVector(0, 0);
   }
 
   // atualiza os atributos do obj / Component
   update(){
+    // calculation of the thrust forces
     this.unids.forEach( (unity) => {
       if( (unity instanceof Propeller)){
 
         if(unity.thrust){
-            console.log(unity);
-          this.applyForce(unity.force, unity.pos);
+          this.apply_thrust(unity.force, unity.pos);
         }
 
       }
     });
     
     // atualiza posição e velocidade linear
-  	this.vel.add( this.accel.rotate(this.theta));
+    this.accel.add( this.thrust_accel.rotate(this.theta));
+  	this.vel.add( this.accel );
   	this.pos.add( this.vel );
 
     // atualiza velocidade e rotação angular
   	this.velAng += this.accelAng;
     this.theta += this.velAng;
-
   }
 
   // mostra na tela todos as partes do objeto
@@ -196,24 +223,35 @@ class Ship {
     // movimenta a origem até a posição do obj
     translate(this.pos.x, this.pos.y);
     
-    // movimenta a origem até o centro de massa
-    translate(this.cmX, this.cmY);
-    
+    if(DEBUG){
+      fill(0, 0, 255);
+      text('pivô', 10, 0);
+      ellipse(0, 0, 10);
+    }
+
     // para rotacionar a name em volta do centro de massa,
     rotate(this.theta);
     
-    // e retorna para o ponto topo esquerdo, com o grid inclidado(theta)
+    // Movimenta o topo esquerdo para fora do centro de Massa,
+    // para desenhar corretamente
     translate(-this.cmX, -this.cmY);
-    
+
     // imprime cada uma das partes
     this.unids.forEach( function(u){
 		    u.display();
 		});
 
-    // imprime o centro de massa
-    fill(255, 0, 0);
-    noStroke();
-    ellipse(this.cmX, this.cmY, 5, 5);
+    if(DEBUG){
+      // imprime o centro de massa
+      fill(255, 0, 0);
+      noStroke();
+      text('CM', -10 + this.cmX, -10 + this.cmY);
+      ellipse(this.cmX, this.cmY, 5);
+
+      // Imprime o ponto (0, 0);
+      fill(0, 255, 0);
+      ellipse(0, 0, 15);
+    }
 
     // imprime os jatos dos propulsores ativados
     this.unids.forEach( (unity) => {
@@ -225,10 +263,8 @@ class Ship {
       }
     });
 
-    pop();
     
-    // reseta a aceleração linear e angular
-    this.accel.mult(0);
-  	this.accelAng = 0;
+
+    pop();
   }
 }

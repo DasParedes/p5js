@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8"/>
+</head>
+<body>
+<h2>HELLO</h2>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"></script>
+<script>
+
+function perpendicular_force(f, p){
+  let force = null;
+  
+  p = p.copy().normalize();
+  let p2 = p.copy().rotate(PI/2);
+
+  
+  console.log('px : %f, py : %f', p.x, p.y);  
+  console.log('p2x: %f, p2y: %f', p2.x, p2.y);
+
+  let escalar_product = f.x * p2.x + f.y * p2.y;
+  let f2 = p5.Vector.mult(p2, escalar_product / pow(p2.mag(), 2) );
+  force = f2;
+  
+  console.log("f''x:%f, f''y:%f", f2.x, f2.y);
+  console.log('p2 and f angle: %f', p2.angleBetween(f));  
+  
+  console.log('force angle: %f', force.heading());
+  console.log('pos. angle: %f', p.heading());
+  console.log('pos.2 angle: %f', p2.heading());
+  return force;
+}
+
+function setup(){
+  createCanvas(400, 400);
+  background(55);    
+  
+  f1=createVector(0,  1);
+  
+  f2=createVector(1,  0);
+  f3=f2.copy().rotate(PI)
+  
+  p1=createVector(5, 0);
+  p2=p1.copy().rotate(PI);
+
+  p3=createVector(0,  5);
+  
+  const scale = 30;
+  push()
+  translate(200, 200);
+  stroke('#ff0000');
+  line( p1.x*scale,   p1.y*scale, 
+        p1.x*scale+f1.x*scale,  p1.y*scale+f1.y*scale);
+
+  line( p3.x*scale,    p3.y*scale, 
+        p3.x*scale+f2.x*scale,  p3.y*scale+f2.y*scale);
+  
+  translate(0,0);
+  stroke('#00ff00');
+  line(0, 0, p1.x*scale,  p1.y*scale);
+  line(0, 0, p3.x*scale,  p3.y*scale);
+  pop();
+  
+  console.log(PI/2);
+  console.log('==========================');
+  console.log(perpendicular_force(f1, p1));
+  console.log('==========================');
+  console.log(perpendicular_force(f1, p2));;
+  console.log('==========================');
+  console.log(perpendicular_force(f2, p3));
+  console.log('==========================');
+  console.log(perpendicular_force(f3, p3));
+  console.log('==========================');
+
+  
+}
+
+function draw(){
+//  fill(180);
+  //rect(200, 200, 100, 50);
+}
+
+</script>
+</body>
+</html>
