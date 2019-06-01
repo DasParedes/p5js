@@ -76,7 +76,7 @@ class Main_Engine extends Propeller {
         endShape();
 
         if(this.thrust){
-        	fill(255, 100, 100);
+        	fill(255, 50, 50);
         	beginShape();
         	/*
         	curveVertex(0, 8);

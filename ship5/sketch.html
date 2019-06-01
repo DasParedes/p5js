@@ -4,12 +4,26 @@
 	<meta charset="utf-8">
   <style>
     body {
+      margin: 0;
+      padding: 0;
+      border: 0;
       background-color: rgba(10, 0, 0);
     }
     #hud {
       position:absolute; 
-      background-color: rgba(255, 0, 0, .5);
+      /*background-color: rgba(255, 150, 150, .7);*/
       width: 400px;
+      text-align: center;
+    }
+
+    #menu_inicial {
+      
+    }
+
+    #menu_edi_ship div {
+      margin: 0;
+      padding: 0;
+      border-spacing: : 0;
     }
   </style>
 </head>
@@ -17,13 +31,31 @@
     <section id="window" style="">
     
       <div id="hud">
-      <!--
-        <div id="map" style="padding: 5px; background-color: #505050; height: 50px; width: 50px">
-          nothing
+        <div id="menu_inicial">
+          <h2>2D Space Game</h2>
+          <p><button onclick="next_state(1);">Start</button></p>
+          <p><button onclick="clean_screen();">Configuration</button></p>
+          <p><button>Login</button></p>
         </div>
-        <h2>HUD</h2>
-        <button>Start</button>
-        -->
+        <div id="menu_edit_ship">
+          <h3>Buid & Edit Ship</h3>
+          <p>Name of the Ship: <input type="text" name="name"/></p>
+          <div id="ship" style="height: 450px;">
+            <div class="space" style="width:70%; float: left;">
+              <p>Ship</p>
+            </div>
+            <div id="parts" style="width:30%; float: left;">
+              <p>Partes</p>
+            </div>
+          </div>
+          <button>Save Ship</button>
+          <button onclick="next_state(2);">Lets Roll</button>
+        </div>
+        <div id="game_loop">
+          <h3>Game Loop</h3>
+          <p hidden>Hello2</p>
+          <p>Hello3</p>
+        </div>
       </div>
     </section>
 
@@ -32,28 +64,52 @@
     <script src="ship.js"></script>
     <script src="keyControls.js"></script>
     <script src="prop.js"></script>
-    <script src="HUD.js"></script>
+    <!--<script src="HUD.js"></script>-->
     <script src="Force.js"></script>
     <script src="Planet.js"></script>
+    <script src="GUI.js"></script>
+    <script src="set_GUI.js"></script>
 
 <script>
+
+function clean_screen(){
+  var elem_window = document.getElementById('hud');
+  var lista_menus = elem_window.childNodes;
+  for(var i=0; i<lista_menus.length; i++){
+    var value = lista_menus[i];
+
+    console.log(value.nodeName != 'text');
+    if(value.nodeName != '#text' && value.attributes['hidden'] == undefined){
+      value.setAttribute('hidden', '');
+    }
+  }
+}
+
+function next_state(state){
+  clean_screen();
+  GAME_MODE = state;
+}
+
 // HUD
 function setSizeHUD(x, y){
   var elem_window = document.getElementById('hud');
   elem_window.style.width = x+'px';
   elem_window.style.height = y+'px';
-}
 
+  console.log('hud');
+  clean_screen();
+  document.getElementById('menu_inicial').removeAttribute('hidden');
+}
 
 // ---------
 function displayGrid(topX, topY, width, height, velocity){
-    // grid of squares with regular size
-    var local_scale = 50; 
+  // grid of squares with regular size
+  var local_scale = 50; 
     
-    // grid of squares with size distorced by velocity.
-    //local_scale = SCALE + velocity*2;
+  // grid of squares with size distorced by velocity.
+  //local_scale = SCALE + velocity*2;
     
-    var left_start = topX - topX%local_scale - local_scale; 
+  var left_start = topX - topX%local_scale - local_scale; 
 	var top_start = topY - topY%local_scale - local_scale;
 	  
 	fill(100);
@@ -62,60 +118,71 @@ function displayGrid(topX, topY, width, height, velocity){
 	var middle_height = top_start + (height/2);
 	var middle_width = left_start + (width/2);
 	
-	for(var i= local_scale/2; i<height/2 + 100; i+= local_scale){
+	for(var i= local_scale/2; i<height/2 + 200; i+= local_scale){
 	    line(left_start, middle_height + i, left_start + width + 100, middle_height + i);
     	line(left_start, middle_height - i, left_start + width + 100, middle_height - i);
 	}
 	
-	for(var j=local_scale/2; j<width/2 + 100; j+= local_scale){
+	for(var j=local_scale/2; j<width/2 + 200; j+= local_scale){
     	line(middle_width + j, top_start, middle_width + j, top_start + height + local_scale);
     	line(middle_width - j, top_start, middle_width - j, top_start + height + local_scale);
 	}
 }
 
 var SCALE = 50;
-
 var ship;
-
 var controls = {};
-
 var planets = [];
 
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
 var FPS = 24;
 
-let height = 600;
-let width = 800;
+let height = window.innerHeight
+             || document.documentElement.clientHeight
+             || document.body.clientHeight;
+
+let width = window.innerWidth
+            || document.documentElement.clientWidth
+            || document.body.clientWidth;
+
+var hud = null;
 
 function setup(){
-
   createCanvas(width, height);
   setSizeHUD(width, height);
 
   // obj 'ship' e a posição inicial
-  ship = new Ship(400+width/2, height/2);
+  ship = new Ship(400, height/2);
   pre_build_ship(ship, controls);
   
   planets.push(new Planet(1000, 400, 400, 500, '#22ffaa'));
   planets.push(new Planet(600, 400, 100, 100, '#22dd22', planets[0]));
   frameRate(FPS);
   console.log(planets);
+
+  hud = create_GUI();
+  background(200);
+  //next_state(1);
 }
 
 var STOP = false;
-var GAME_MODE = 1;
+var GAME_MODE = 0;
 
 function draw(){
+  hud.display();
   switch(GAME_MODE){
     case 0:
-      menu();
+      //menu();
       break;
     case 1:
-      game_loop();
+      document.getElementById('menu_edit_ship').removeAttribute('hidden');
       break;
     case 2:
-      pause_game();
+      game_loop();
+      break;
+    case 3:
+      pause_menu();
       break;
     case 3:
       config_menu();
@@ -127,12 +194,9 @@ function draw(){
 function pause(){
 	STOP = !STOP;
  }
+ 
 
-function menu(){
-  strokeWeight(0);
-  fill(255);
-  text('Menu Inicial', 50, 100);
-}
+
 
 function game_loop(){
   var copy_accel = ship.accel.copy();

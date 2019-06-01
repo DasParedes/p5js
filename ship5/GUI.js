@@ -9,16 +9,26 @@ class Button{
 		this.g = 100;
 		this.b = 100;
 
+		this.text = ''
 		// objeto fixo ?
 		this.fixed = true;
 
 		// is be dragged
 		this.dragged = false;
+
+		this.center = false;
 	}
 
 	display(){
+		if (this.center){
+			push();
+			translate(-this.x/2, -this.y/2);
+		}
 		fill(this.r, this.g, this.b);
 		rect(this.x, this.y, this.width, this.height);
+		text(this.text, this.x, this.y);
+		if (center)
+			pop();
 	}
 
 	// function of the button
@@ -108,4 +118,6 @@ class HUD {
 			target.mouseHover();
 		}
 	}
+
+
 }
