@@ -91,6 +91,7 @@ class HUD {
 		this.actual = null;
 		this.lista = [];
 		this.mouseHover = [];
+		this.target = null;
 	}
 
 	addAba(obj){
@@ -118,6 +119,4 @@ class HUD {
 			target.mouseHover();
 		}
 	}
-
-
 }

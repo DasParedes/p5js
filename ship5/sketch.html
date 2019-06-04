@@ -44,7 +44,7 @@
             <div class="space" style="width:70%; float: left;">
               <p>Ship</p>
             </div>
-            <div id="parts" style="width:30%; float: left;">
+            <div class="parts" style="width:30%; float: left;">
               <p>Partes</p>
             </div>
           </div>
@@ -134,6 +134,8 @@ var ship;
 var controls = {};
 var planets = [];
 
+const SHIP_CONSTRUCTION = 1;
+
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
 var FPS = 24;
@@ -163,7 +165,7 @@ function setup(){
 
   hud = create_GUI();
   background(200);
-  //next_state(1);
+  next_state(1);
 }
 
 var STOP = false;
@@ -175,7 +177,7 @@ function draw(){
     case 0:
       //menu();
       break;
-    case 1:
+    case SHIP_CONSTRUCTION:
       document.getElementById('menu_edit_ship').removeAttribute('hidden');
       break;
     case 2:
@@ -209,7 +211,7 @@ function game_loop(){
     planets.forEach( (planet) => {
       //if (p5.Vector.sub(planet.pos, ship.pos).mag() < 1000){
       planet.update();
-      ship.apply_force(planet.force_attraction(ship));
+      //ship.apply_force(planet.force_attraction(ship));
       ship.collision(planet);
       //}
     });
