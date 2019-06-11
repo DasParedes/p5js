@@ -5,7 +5,7 @@ class Button{
 		this.width = width;
 		this.height = height;
 
-		this.r = 100;
+		this.r = 200;
 		this.g = 100;
 		this.b = 100;
 
@@ -17,18 +17,22 @@ class Button{
 		this.dragged = false;
 
 		this.center = false;
+		
+		this.image_function = null;
 	}
 
 	display(){
-		if (this.center){
-			push();
-			translate(-this.x/2, -this.y/2);
-		}
+		push();
+		translate(this.x/2, this.y/2);
+		
 		fill(this.r, this.g, this.b);
 		rect(this.x, this.y, this.width, this.height);
 		text(this.text, this.x, this.y);
-		if (center)
-			pop();
+		
+	    
+		if(this.image_function != null){
+		    this.image_function();
+		}
 	}
 
 	// function of the button
@@ -53,22 +57,32 @@ class Button{
 }
 
 class Component{
-	constructor(){
+	constructor(x, y){
 		this.lista = [];
+		this.x = x;
+		this.y = y;
 	}
 
 	addObj(obj){
 		this.lista.push(obj);
 	}
-
+    
+    add(obj){
+        this.lista.push(obj);
+    }
+    
 	display(){
+	    push();
+	    translate(this.x, this.y);
+	    
 		this.lista.forEach( function(obj){
 			obj.display();
 		});
+		pop();
 	}
 
 	isInside(){
-		var reference;
+		var reference = null;
 		this.lista.forEach( function(current, index, array, thisArg){
 			console.log(mouseX + " " + mouseY);
 			if(current.x + current.width > mouseX &&

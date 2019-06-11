@@ -138,7 +138,7 @@ const SHIP_CONSTRUCTION = 1;
 
 // center the camera and the ship in the middle of the screen
 var CENTER_CAMERA = true;
-var FPS = 24;
+var FPS = 4;
 
 let height = window.innerHeight
              || document.documentElement.clientHeight
@@ -164,7 +164,7 @@ function setup(){
   console.log(planets);
 
   hud = create_GUI();
-  background(200);
+  background(50);
   next_state(1);
 }
 
@@ -172,6 +172,9 @@ var STOP = false;
 var GAME_MODE = 0;
 
 function draw(){
+  if(hud.actual == null && hud.lista.length != 0){
+    hud.actual = hud.lista[0]
+  }
   hud.display();
   switch(GAME_MODE){
     case 0:

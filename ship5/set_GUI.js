@@ -1,7 +1,8 @@
 function create_GUI(){
   var hud = new HUD();
-  
-  var menu_partes = new Component();
+
+  var menu_partes = new Component(width - 150, 200);
+  hud.addAba(menu_partes);
   
   var parts = [
     ['strong_engine', Main_Engine],
@@ -9,7 +10,30 @@ function create_GUI(){
     ['unity', Unity ]
   ];  
   
+  parts.forEach( (parte, index) => {
+    var b = new Button(0, 50*index + 10*index, 50, 50);
+    console.log(parte);
+    b.image_function = parte[1].prototype.display;
+    menu_partes.add(b);
+    
+  });
   
+  return hud;
+}
+
+function mousePressed(){
+  if (GAME_MODE == SHIP_CONSTRUCTION){
+    
+  }
+}
+
+
+
+
+
+
+
+function GUI_with_html(){
   var menu_edit = document.getElementById("menu_edit_ship");
   var parts_menu = menu_edit.getElementsByClassName('parts')[0];
 
@@ -40,12 +64,4 @@ function create_GUI(){
 
   parts_menu.appendChild(lista);
   //parts_menu.appendChild('');
-  
-  return hud;
-}
-
-function mousePressed(){
-  if (GAME_MODE == SHIP_CONSTRUCTION){
-    
-  }
 }

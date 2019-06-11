@@ -10,7 +10,8 @@ class Propeller extends Unity {
 
     display(){
       	translate(this.posX, this.posY);
-        rotate(this.force.heading()+PI/2);
+      	if(this.force != null)
+            rotate(this.force.heading()+PI/2);
 	}
 }
 
@@ -23,6 +24,7 @@ class Control_Engine extends Propeller {
     
     display(){
         push();
+        console.log('\\/');
         super.display();
         fill(55);
         
@@ -47,6 +49,7 @@ class Control_Engine extends Propeller {
         	
             endShape();
       	}
+        console.log('/\\');
       	pop();
     }
 }
@@ -107,7 +110,7 @@ class Propulsao {
 		this.lista.push([p, key]);
 	}
 
-  display(){
+    display(){
     this.jatos.foreach( function(v){
       v.display();
     });
