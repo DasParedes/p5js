@@ -24,7 +24,6 @@ class Control_Engine extends Propeller {
     
     display(){
         push();
-        console.log('\\/');
         super.display();
         fill(55);
         
@@ -49,7 +48,6 @@ class Control_Engine extends Propeller {
         	
             endShape();
       	}
-        console.log('/\\');
       	pop();
     }
 }

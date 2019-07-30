@@ -19,20 +19,24 @@ class Button{
 		this.center = false;
 		
 		this.image_function = null;
+
+		this.function = function(){};
 	}
 
 	display(){
 		push();
-		translate(this.x/2, this.y/2);
+		translate(this.x, this.y);
 		
 		fill(this.r, this.g, this.b);
-		rect(this.x, this.y, this.width, this.height);
+		rect(0, 0, this.width, this.height);
 		text(this.text, this.x, this.y);
 		
 	    
 		if(this.image_function != null){
+			translate(this.width/2, this.height/2);
 		    this.image_function();
 		}
+		pop();
 	}
 
 	// function of the button
@@ -40,19 +44,44 @@ class Button{
 		this.r = 200;
 		this.g = 200;
 		this.b = 200;
+
+		return this.function;
 	}
 
 	disAction(){
-		this.r = 100;
+		this.r = 200;
 		this.g = 100;
 		this.b = 100;
 	}
 
 	// 
-	mouseHover(){
-		this.r = 150;
-		this.g = 150;
-		this.b = 150;
+	realce(){
+		this.r = 100;
+		this.g = 100;
+		this.b = 200;
+	}
+
+	desRealce(){
+		this.disAction();	
+	}
+}
+
+class Texto{
+	constructor(x, y, txt){
+		this.pos = createVector(x,y);
+		this.txt = txt;
+		this.width = 0;
+		this.height = 0;
+
+	}
+
+	display(){
+		push();
+		translate(this.pos.x, this.pos.y);
+		fill(0,0,0);
+		textSize(20);
+		text(this.txt, -4, 40);
+		pop();
 	}
 }
 
@@ -61,6 +90,11 @@ class Component{
 		this.lista = [];
 		this.x = x;
 		this.y = y;
+		this.width = null;
+		this.height = null;
+		this.color = null;
+
+		this.name = '';
 	}
 
 	addObj(obj){
@@ -74,7 +108,12 @@ class Component{
 	display(){
 	    push();
 	    translate(this.x, this.y);
-	    
+	    if(this.width && this.height){
+	    	if(this.color)
+	    		fill(this.color);
+	    	rect(0, 0, this.width, this.height);
+	    }
+
 		this.lista.forEach( function(obj){
 			obj.display();
 		});
@@ -82,14 +121,16 @@ class Component{
 	}
 
 	isInside(){
-		var reference = null;
-		this.lista.forEach( function(current, index, array, thisArg){
-			console.log(mouseX + " " + mouseY);
-			if(current.x + current.width > mouseX &&
-				 current.x < mouseX &&
-				 current.y + current.height > mouseY &&
-				 current.y < mouseY){
-					if(typeof(current.isInside) === "Function"){
+		var reference = this;
+		var offsetX = mouseX - this.x;
+		var offsetY = mouseY - this.y;
+		
+		this.lista.forEach( function(current, index){
+			if(current.x + current.width > offsetX &&
+				 current.x < offsetX &&
+				 current.y + current.height > offsetY &&
+				 current.y < offsetY){
+					if(typeof(current.isInside) === "function"){
 						reference = current.isInside();
 					}else{
 					 	reference = current;
@@ -102,9 +143,10 @@ class Component{
 
 class HUD {
 	constructor(){
+		this.action = function(){}; // manter ??
 		this.actual = null;
 		this.lista = [];
-		this.mouseHover = [];
+		this.mouseHover = null;
 		this.target = null;
 	}
 
@@ -113,7 +155,13 @@ class HUD {
 	}
 
 	isInside(){
-		return this.actual.isInside();
+		var target = null;
+
+		if (this.actual)
+			target = this.actual.isInside();
+		console.log('target: ');
+		console.log(target);
+		return target;	
 	}
 
 	mouseDragged(){

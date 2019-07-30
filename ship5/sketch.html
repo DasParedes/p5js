@@ -7,7 +7,7 @@
       margin: 0;
       padding: 0;
       border: 0;
-      background-color: rgba(10, 0, 0);
+      background-color: rgba(20, 0, 0);
     }
     #hud {
       position:absolute; 
@@ -45,7 +45,7 @@
               <p>Ship</p>
             </div>
             <div class="parts" style="width:30%; float: left;">
-              <p>Partes</p>
+              <!--<p>Partes</p>-->
             </div>
           </div>
           <button>Save Ship</button>
@@ -129,16 +129,19 @@ function displayGrid(topX, topY, width, height, velocity){
 	}
 }
 
+var FPS = 1;
+// center the camera and the ship in the middle of the screen
+var CENTER_CAMERA = true;
+
+
+
+
 var SCALE = 50;
 var ship;
 var controls = {};
 var planets = [];
 
 const SHIP_CONSTRUCTION = 1;
-
-// center the camera and the ship in the middle of the screen
-var CENTER_CAMERA = true;
-var FPS = 4;
 
 let height = window.innerHeight
              || document.documentElement.clientHeight
@@ -175,6 +178,7 @@ function draw(){
   if(hud.actual == null && hud.lista.length != 0){
     hud.actual = hud.lista[0]
   }
+  background(100);
   hud.display();
   switch(GAME_MODE){
     case 0:
